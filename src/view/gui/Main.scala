@@ -121,14 +121,14 @@ class ViewManager(group: Group,
     //val mediaPlayer = new MediaPlayer(new Media("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv"))
     val mediaView = new MediaView(mediaPlayer)
 
-    val playButton = new javafx.scene.control.Button("Play")
+    val playButton = new javafx.scene.control.Button("|>")
     playButton.setOnMouseClicked(new EventHandler[MouseEvent] {
       override def handle(event: MouseEvent) {
         mediaPlayer.play()
       }
     })
 
-    val pauseButton = new javafx.scene.control.Button("Pause")
+    val pauseButton = new javafx.scene.control.Button("||")
     pauseButton.setOnMouseClicked(new EventHandler[MouseEvent] {
       override def handle(event: MouseEvent) {
         mediaPlayer.pause()
@@ -159,6 +159,8 @@ class ViewManager(group: Group,
     })
 
     val hbox2 = new HBox
+    hbox2.setTranslateX(250)
+    hbox2.setTranslateY(540)
     hbox2.getChildren.addAll(playButton, pauseButton, seekSlider, volumeSlider)
 
     menu.node.getChildren.add(hbox2)

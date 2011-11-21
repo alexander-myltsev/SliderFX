@@ -15,11 +15,14 @@ resolvers += "Local Maven Repository" at "file:///Users/alex/.m2/repository"
 // set the main Scala source directory to be <base>/src
 //scalaSource in Compile <<= baseDirectory(_ / "src")
 
-unmanagedSourceDirectories in Compile <++= baseDirectory { base =>
-  Seq(
-    base / "src",
-    base / "demo"
-  )
+unmanagedSourceDirectories in Compile <++= baseDirectory {
+  base =>
+    Seq(
+      base / "src" / "controller",
+      base / "src" / "model",
+      base / "src" / "view",
+      base / "demo"
+    )
 }
 
 // set the Scala test source directory to be <base>/test
@@ -76,7 +79,9 @@ mainClass in (Compile, run) := Some("gui.Main")
 //mainClass in (Compile, run) := Some("scalafx.JumpingFrogsPuzzle")
 
 // add <base>/input to the files that '~' triggers on
-watchSources <+= baseDirectory map { _ / "input" }
+watchSources <+= baseDirectory map {
+  _ / "input"
+}
 
 // add a maven-style repository
 // resolvers += "name" at "url"
@@ -94,10 +99,14 @@ ivyLoggingLevel := UpdateLogging.Full
 offline := true
 
 // set the prompt (for this build) to include the project id.
-shellPrompt in ThisBuild := { state => Project.extract(state).currentRef.project + "> " }
+shellPrompt in ThisBuild := {
+  state => Project.extract(state).currentRef.project + "> "
+}
 
 // set the prompt (for the current project) to include the username
-shellPrompt := { state => System.getProperty("user.name") + "> " }
+shellPrompt := {
+  state => System.getProperty("user.name") + "> "
+}
 
 // disable printing timing information, but still print [success]
 showTiming := false
@@ -107,8 +116,8 @@ showSuccess := false
 
 // change the format used for printing task completion time
 timingFormat := {
-    import java.text.DateFormat
-    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+  import java.text.DateFormat
+  DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
 }
 
 // disable using the Scala version in output paths and artifacts

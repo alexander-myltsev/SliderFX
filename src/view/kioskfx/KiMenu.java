@@ -4,14 +4,22 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.web.HTMLEditor;
+import twitter4j.*;
+import twitter4j.conf.ConfigurationBuilder;
 
 import java.util.Vector;
 
@@ -42,6 +50,114 @@ public class KiMenu {
     private int titleSize;
     private int itemSize;
 
+    private Node questionDialog() {
+        final Group root = new Group();
+        Button questionButton = new Button("Ask question");
+        questionButton.translateXProperty().bind(width.subtract(questionButton.widthProperty()).subtract(40));
+
+        questionButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            boolean isQuestioned = false;
+            VBox vBox = null;
+
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                //System.out.println(isQuestioned);
+                isQuestioned = !isQuestioned;
+
+                if (vBox == null) {
+                    HTMLEditor htmlEditor = new HTMLEditor();
+                    htmlEditor.translateXProperty().bind(width.subtract(htmlEditor.widthProperty()).subtract(140));
+                    Button sendButton = new Button("Send");
+                    sendButton.translateXProperty().bind(width.subtract(sendButton.widthProperty()).subtract(140));
+                    sendButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent mouseEvent) {
+                            isQuestioned = false;
+                            root.getChildren().remove(vBox);
+                        }
+                    });
+                    //Button cancelButton = new Button("Cancel");
+                    //cancelButton.translateXProperty().bind(width.subtract(cancelButton.widthProperty()).subtract(50));
+
+                    vBox = new VBox();
+                    vBox.getChildren().addAll(htmlEditor, sendButton);
+                }
+
+                if (isQuestioned) {
+                    root.getChildren().add(vBox);
+                } else {
+                    root.getChildren().remove(vBox);
+                }
+            }
+        });
+
+        root.getChildren().add(questionButton);
+
+        return root;
+    }
+
+    private Node newsDialog() {
+        final Group root = new Group();
+        Button newsButton = new Button("News");
+        newsButton.translateXProperty().bind(width.subtract(newsButton.widthProperty()).subtract(40));
+        newsButton.translateYProperty().bind(height.subtract(80));
+
+        ConfigurationBuilder cb = new ConfigurationBuilder();
+        cb.setDebugEnabled(true)
+                .setOAuthConsumerKey("9p0kAfDL1I4cagWlNp0yg")
+                .setOAuthConsumerSecret("hUvGmG4usPTu325N5G5NLsVYL6X386LTFKMfRDZbBmI")
+                .setOAuthAccessToken("409588609-0ATCb2Anz80iTOq0bemQULMjjV6ETyik789hDqt2")
+                .setOAuthAccessTokenSecret("p8KXOaJT6lZFT2KdCI9iMu5nbPIuZgFr7GmH3gw");
+        TwitterFactory tf = new TwitterFactory(cb.build());
+        final Twitter twitter = tf.getInstance();
+
+        newsButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            boolean isQuestioned = false;
+            VBox vBox = null;
+
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                //System.out.println(isQuestioned);
+                isQuestioned = !isQuestioned;
+
+                if (vBox == null) {
+                    vBox = new VBox();
+
+                    try {
+                        Query query = new Query("from:nvidia");
+                        QueryResult result = twitter.search(query);
+                        TextArea textArea = new TextArea();
+                        textArea.translateXProperty().bind(width.subtract(textArea.widthProperty()).subtract(100));
+                        textArea.translateYProperty().bind(height.subtract(250));
+
+                        for (Tweet tweet : result.getTweets()) {
+                            //System.out.println(tweet.getFromUser() + ":" + tweet.getText());
+                            textArea.setText(textArea.getText() + tweet.getFromUser() + ":" + tweet.getText() + "\n");
+                        }
+
+                        textArea.minHeightProperty().set(200);
+                        textArea.minWidthProperty().set(900);
+
+                        vBox.getChildren().addAll(textArea);
+                    } catch (TwitterException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+
+                }
+
+                if (isQuestioned) {
+                    root.getChildren().add(vBox);
+                } else {
+                    root.getChildren().remove(vBox);
+                }
+            }
+        });
+
+        root.getChildren().add(newsButton);
+
+        return root;
+    }
+
     public KiMenu() {
         width = new SimpleDoubleProperty(900);
         height = new SimpleDoubleProperty(600);
@@ -49,7 +165,7 @@ public class KiMenu {
         iconWidth = new SimpleDoubleProperty(150);
         iconHeight = new SimpleDoubleProperty(120);
         leftMargin = new SimpleDoubleProperty(250);
-        topMargin = new SimpleDoubleProperty(100);
+        topMargin = new SimpleDoubleProperty(30);
         currentSection = new SimpleIntegerProperty(-1);
         currentShift = new SimpleDoubleProperty(0.0);
         itemColor = new SimpleObjectProperty<Color>(Color.web("#ffffff"));
@@ -115,14 +231,16 @@ public class KiMenu {
                         .add(leftMargin));
         actionsGroup = new Group();
         actionsGroup.translateXProperty().bind(leftMargin);
-        actionsGroup.translateYProperty().bind(
-                topMargin.add(iconHeight).add(16));
+        actionsGroup.translateYProperty().bind(topMargin);
         // currentSection.multiply(sectionWidth).
         // leftMargin);
-        sectionsGroup.translateYProperty().bind(topMargin);
+        sectionsGroup.translateYProperty().bind(topMargin.add(itemHeight).add(50));
         root.getChildren().add(sectionsGroup);
         root.getChildren().add(actionsGroup);
         addWatchers();
+
+        root.getChildren().add(questionDialog());
+        root.getChildren().add(newsDialog());
 
         // currentSection.set(0);
 
