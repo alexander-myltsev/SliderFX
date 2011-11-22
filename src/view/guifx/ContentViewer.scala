@@ -11,13 +11,15 @@ import scalafx.scene.paint.Color
 import scalafx.beans.property.{ReadOnlyDoubleProperty, DoubleProperty, IntegerProperty}
 import scalafx.scene.layout.{VBox, HBox, BorderPane}
 import scalafx.scene.control.Button
-
 import scalafx.scene.image._
 import scalafx.scene.layout.GridPane
+import scalafx.scene.control.TextArea
 
 import javafx.beans.property.{SimpleIntegerProperty, SimpleDoubleProperty}
 import scalafx.scene.layout.BorderPane._
 import javafx.scene.input.MouseEvent
+import javafx.scene.web.HTMLEditor
+import javafx.scene.layout.{RowConstraints, ColumnConstraints}
 
 case class SelectorTemplateParts(left: Node = null, right: Node = null, center: Node = null, bottom: Node = null, top: Node = null)
 
@@ -64,6 +66,12 @@ class ContentViewer extends BorderPane {
       fill = Color.web("#0000FF")
     }
 
+    left = new Rectangle {
+      width <== sider_width
+      height <== h - header_height * 2.0
+      fill = Color.web("#00FF00") //Color.web("#00CED1") //Color.DARKTURQUOISE
+    }
+
     center = new GridPane {
       content = List((new ImageView {
         image = lecturesDescriptions(0).previewPath
@@ -83,17 +91,24 @@ class ContentViewer extends BorderPane {
         }, 0, 0))
     }
 
-    right = new Rectangle {
-      width <== sider_width
-      height <== h - header_height * 2.0
-      fill = Color.web("#00FF00") //Color.web("#00CED1") //Color.DARKTURQUOISE
-    }
+    // TODO: Fix bug when goback from slides
+    val gp = new GridPane {
+      content = List((new TextArea, 0, 0),
+        (new Button {
+          text = "Send question"
+          translateX = 100
+          translateY = 150
+          onMouseClicked = mouseClickedHandler((_: MouseEvent))
 
-    left = new Rectangle {
-      width <== sider_width
-      height <== h - header_height * 2.0
-      fill = Color.web("#00FF00") //Color.web("#00CED1") //Color.DARKTURQUOISE
+          def mouseClickedHandler(x: MouseEvent) = {
+            println("=====> Question sent")
+          }
+        }, 0, 0))
     }
+    val rc = new RowConstraints()
+    rc.setMinHeight(300)
+    gp.rowConstraints.addAll(rc)
+    right = gp
 
     this
   }

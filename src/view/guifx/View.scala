@@ -28,7 +28,7 @@ object View extends JFXApp {
     title = "GUI prototype"
 
     scene = new Scene {
-      fill = BLACK
+      fill = WHITE
     }
   }
 
