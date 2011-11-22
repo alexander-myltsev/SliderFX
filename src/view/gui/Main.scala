@@ -1,9 +1,12 @@
 package gui
 
 import javafx.beans.value._
-import javafx.beans.property._
 import javafx.event._
 import scalafx.scene.control.Label
+import scalafx.scene.layout.BorderPane._
+import scalafx.scene.shape.Rectangle
+import scalafx.scene.shape.Shape._
+import scalafx.scene.paint.Color
 
 //import javafx.scene.control._
 
@@ -31,8 +34,8 @@ case class LecturesSelect() extends Cmd
 case class SlidesSelect(lectureNum: Int) extends Cmd
 
 class ViewManager(group: Group,
-                  widthProperty: ReadOnlyDoubleProperty,
-                  heightProperty: ReadOnlyDoubleProperty) {
+                  widthProperty: javafx.beans.property.ReadOnlyDoubleProperty,
+                  heightProperty: javafx.beans.property.ReadOnlyDoubleProperty) {
 
   def authorize(): Unit = {
     /*
@@ -69,6 +72,7 @@ class ViewManager(group: Group,
   }
 
   def lecturesSelector(): Unit = {
+    /*
     val menu =
       new KiMenu()
         .width(widthProperty)
@@ -92,6 +96,26 @@ class ViewManager(group: Group,
 
     group.children.clear
     group.children.add(menu.node)
+    */
+
+    /*
+    val ls = new guifx.LectureSelector() {
+      //width <== widthProperty
+      //height <== heightProperty
+    }
+    */
+
+    /*
+    val layout = new BorderPane();
+    layout.setTop(new Rectangle(200, 50, Color.DARKCYAN));
+    layout.setBottom(new Rectangle(200, 50, Color.DARKCYAN));
+    layout.setCenter(new Rectangle(100, 100, Color.MEDIUMAQUAMARINE));
+    layout.setLeft(new Rectangle(50, 100, Color.DARKTURQUOISE));
+    layout.setRight(new Rectangle(50, 100, Color.DARKTURQUOISE));
+
+    group.children.clear
+    group.children.add(ls)
+    */
   }
 
   def slidesSelector(lectureNum: Int): Unit = {
@@ -178,21 +202,21 @@ class ViewManager(group: Group,
 }
 
 object Main extends JFXApp {
-  val group = new Group
-
   stage = new Stage {
     width = 1200
     height = 800
     title = "GUI prototype"
 
     scene = new Scene {
-      content = List(group)
+
     }
   }
 
-  val vm = new ViewManager(group, stage.widthProperty, stage.heightProperty)
+  //stage.setFullScreen(true)
+
+  //val vm = new ViewManager(group, stage.widthProperty, stage.heightProperty)
   //vm.fill(Authorize())
-  vm.fill(LecturesSelect())
+  //vm.fill(LecturesSelect())
   //vm.fill(SlidesSelect(1))
 }
 

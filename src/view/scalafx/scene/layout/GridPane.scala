@@ -7,7 +7,7 @@ import javafx.geometry.Pos
 import scalafx.scene.Node
 
 object GridPane {
-  implicit def sfxHBox2jfx(v: GridPane) = v.delegate
+  implicit def sfxGridPane2jfx(v: GridPane) = v.delegate
 }
 
 class GridPane(override val delegate: jfxsl.GridPane = new jfxsl.GridPane()) extends Pane with SFXDelegate[jfxsl.GridPane] {

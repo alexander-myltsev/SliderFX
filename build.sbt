@@ -74,8 +74,8 @@ initialCommands := """
 
 // set the main class for the main 'run' task
 // change Compile to Test to set it for 'test:run'
-//mainClass in (Compile, run) := Some("scalafx.ColorfulCircles")
-mainClass in (Compile, run) := Some("gui.Main")
+//mainClass in (Compile, run) := Some("scalafx.SimpleColorfulCircles")
+mainClass in (Compile, run) := Some("guifx.Main1")
 //mainClass in (Compile, run) := Some("scalafx.JumpingFrogsPuzzle")
 
 // add <base>/input to the files that '~' triggers on

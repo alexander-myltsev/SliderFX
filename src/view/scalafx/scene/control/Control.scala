@@ -87,5 +87,4 @@ abstract class Control extends Node with SFXDelegate[jfxsc.Control] {
   }
 
   def width = delegate.widthProperty
-  
 }

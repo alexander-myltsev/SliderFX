@@ -37,8 +37,11 @@ object DoubleProperty {
 class DoubleProperty(override val delegate: jfxbp.DoubleProperty) extends ReadOnlyDoubleProperty(delegate) with Property[Double, Number] with SFXDelegate[jfxbp.DoubleProperty] {
   def this(bean: Object, name: String) = this (new jfxbp.DoublePropertyBase() {
     def getBean = bean
+
     def getName = name
   })
+
+  //def this(v: Double) = this(new jfxbp.SimpleDoubleProperty(v))
 
   def value_=(v: Double) {
     delegate.set(v)

@@ -30,6 +30,7 @@ package scalafx.scene.shape
 import scalafx.Includes._
 import javafx.scene.{shape => jfxss}
 import scalafx.util.SFXDelegate
+import scalafx.scene.paint.Color
 
 object Rectangle {
   implicit def sfxRectangle2jfx(v: Rectangle) = v.delegate
@@ -65,4 +66,11 @@ class Rectangle(override val delegate:jfxss.Rectangle = new jfxss.Rectangle()) e
   def arcHeight_=(v: Double) {
     arcHeight() = v
   }
+
+  /*
+  def fill = delegate.fillProperty
+  def fill_=(v: Color) {
+    fill() = v
+  }
+  */
 }

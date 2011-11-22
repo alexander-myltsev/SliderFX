@@ -12,6 +12,7 @@ class Label(override val delegate: ctrl.Label = new ctrl.Label()) extends Contro
   def text = delegate.textProperty
 
   def text_=(v: String) {
+    // TODO: Find out why this doesn't work?
     //text() = v
     delegate.textProperty.setValue(v)
   }
