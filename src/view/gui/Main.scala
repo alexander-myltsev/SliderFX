@@ -99,7 +99,7 @@ class ViewManager(group: Group,
     */
 
     /*
-    val ls = new guifx.LectureSelector() {
+    val ls = new guifx.ContentViewer() {
       //width <== widthProperty
       //height <== heightProperty
     }
@@ -215,7 +215,7 @@ object Main extends JFXApp {
   //stage.setFullScreen(true)
 
   //val vm = new ViewManager(group, stage.widthProperty, stage.heightProperty)
-  //vm.fill(Authorize())
+  //vm.fill(AuthorizeCmd())
   //vm.fill(LecturesSelect())
   //vm.fill(SlidesSelect(1))
 }
