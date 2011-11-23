@@ -47,4 +47,6 @@ trait LowerPriorityIncludes {
   }
   implicit def jfxScene2sfx(v: jfxs.Scene) = new Scene(v)
   implicit def jfxSceneProperty2sfx(p: jfxbp.ReadOnlyObjectProperty[jfxs.Scene]) = new SceneProperty(p)
+
+  implicit def jfxButton2sfx(v: jfxs.control.Button) = new control.Button(v)
 }

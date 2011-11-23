@@ -49,7 +49,9 @@ object Controller {
       case ((ls: LectureSelect), (cmd: GetLecturesDescriptionsCmd)) => cmd.lecturesDescriptions = LectureManager.getLecturesDescriptions
       case ((ls: LectureSelect), (cmd: GoBackCmd)) => ClientState.state = new Authorization
 
-      case ((ss: SlideSelect), (cmd: SelectSlideCmd)) => ss.slideNumber = cmd.slideNumber
+      case ((ss: SlideSelect), (cmd: SelectSlideCmd)) =>
+        ss.slideNumber = cmd.slideNumber
+        View.selectSlide(ss.slideNumber)
       case ((ss: SlideSelect), (cmd: VolumeCmd)) => ss.volume = cmd.volume
       case ((ss: SlideSelect), (cmd: PlaybackStatusCmd)) => ss.playbackStatus = cmd.playbackStatus
       case ((ls: SlideSelect), (cmd: GetSlidesCmd)) => cmd.slidesInfo = LectureManager.getSlidesInfo(cmd.lectureNumber)

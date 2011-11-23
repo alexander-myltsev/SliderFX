@@ -7,6 +7,7 @@ import scalafx.scene.Scene
 import javafx.scene.paint.Color._
 
 object View extends JFXApp {
+  // TODO: remove these nulls
   var lv: LecturesViewer = null
 
   var sv: SlidesViewer = null
@@ -32,6 +33,8 @@ object View extends JFXApp {
   }
 
   def selectLecture(lectureNum: Int): Unit = lv.selectLecture(lectureNum)
+
+  def selectSlide(slideNum: Int): Unit = sv.selectSlide(slideNum)
 
   stage = new Stage {
     width = 1350

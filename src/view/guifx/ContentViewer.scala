@@ -1,7 +1,6 @@
 package guifx
 
-import controller._
-
+import _root_.controller._
 import scalafx.Includes._
 import scalafx.stage.Stage
 import scalafx.scene.Node
@@ -59,12 +58,6 @@ class LecturesViewer extends BorderPane {
     fill = Color.web("#0000FF")
   }
 
-  //    left = new Rectangle {
-  //      width <== sider_width
-  //      height <== h - header_height * 2.0
-  //      fill = Color.web("#00FF00") //Color.web("#00CED1") //Color.DARKTURQUOISE
-  //    }
-
   val centralImage = new ImageView {
     image = lecturesDescriptions.find(_.id == 1) match {
       case Some(x) => x.previewPath
@@ -119,7 +112,7 @@ class LecturesViewer extends BorderPane {
         onMouseClicked = mouseClickedHandler((_: MouseEvent))
 
         def mouseClickedHandler(x: MouseEvent) = {
-          println("DEBUG: Question sent")
+          println("DEBUG: Question is sent")
         }
       }, 0, 0))
   }
@@ -132,7 +125,16 @@ class LecturesViewer extends BorderPane {
 }
 
 class SlidesViewer extends BorderPane {
-  val thumbnailHeight = 150.0
+  def selectSlide(slideNum: Int): Unit = {
+    // TODO: simplify centralImage.image.value
+    val path = slidesInfo.find(_.id == slideNum) match {
+      case Some(x) => x.previewPath
+      case None => throw new Exception("Slide with id == " + slideNum + " is not found.")
+    }
+    centralImage.image.value = new javafx.scene.image.Image(path)
+  }
+
+  val thumbnailHeight = 20.0
   val thumbnailWidth = 150.0
   val thumbnailSpacing = 10.0
 
@@ -148,12 +150,14 @@ class SlidesViewer extends BorderPane {
     cmd.slidesInfo
   }
 
+  val centralImage = new ImageView {
+    image = slidesInfo.head.previewPath
+    fitWidth <== w - sider_width * 2.0
+    fitHeight <== h - header_height * 2.0
+  }
+
   center = new GridPane {
-    content = List((new ImageView {
-      image = slidesInfo(1).previewPath
-      fitWidth <== w - sider_width * 2.0
-      fitHeight <== h - header_height * 2.0
-    }, 0, 0),
+    content = List((centralImage, 0, 0),
       (new Button {
         text = "<|"
         translateX = 70
@@ -167,16 +171,29 @@ class SlidesViewer extends BorderPane {
       }, 0, 0))
   }
 
-  right = new Rectangle {
-    width <== sider_width
-    height <== h - header_height * 2.0
-    fill = Color.web("#00FF00") //Color.web("#00CED1") //Color.DARKTURQUOISE
-  }
+  left = new VBox {
+    //      def mouseClickedHandler(x: MouseEvent) = {
+    //        println("DEBUG: Lecture selected " + x)
+    //        //Controller.executeCommand(new GoForwardCmd)
+    //      }
 
-  left = new Rectangle {
-    width <== sider_width
-    height <== h - header_height * 2.0
-    fill = Color.web("#00FF00") //Color.web("#00CED1") //Color.DARKTURQUOISE
+    val buttons: List[Button] = for (si <- slidesInfo) yield {
+      new Button {
+        text = si.title
+        minWidth = thumbnailWidth
+
+        onMouseClicked = ((x: MouseEvent) => {
+          // TODO: move this multiple instanced handler to one handler
+          println("DEBUG: slide selected - " + si.id)
+          Controller.executeCommand(new SelectSlideCmd(si.id))
+
+          buttons foreach ((b: Button) => b.minHeight.set(thumbnailHeight))
+          x.getSource.asInstanceOf[javafx.scene.control.Button].setMinHeight(thumbnailHeight + 50)
+        })
+      }
+    }
+    content = buttons
+    spacing = thumbnailSpacing
   }
 
   bottom = new Rectangle {
@@ -191,4 +208,25 @@ class SlidesViewer extends BorderPane {
     fill = Color.web("#0000FF")
   }
 
+  // TODO: remove code duplication with LectureViewer
+  // TODO: Fix bug when goback from slides
+  val gp = new GridPane {
+    content = List((new TextArea, 0, 0),
+      (new Button {
+        text = "Send question"
+        translateX = 100
+        translateY = 150
+        onMouseClicked = mouseClickedHandler((_: MouseEvent))
+
+        def mouseClickedHandler(x: MouseEvent) = {
+          println("DEBUG: Question is sent")
+        }
+      }, 0, 0))
+  }
+
+  // TODO: Simplify it
+  val rc = new RowConstraints()
+  rc.setMinHeight(300)
+  gp.rowConstraints.addAll(rc)
+  right = gp
 }
