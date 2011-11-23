@@ -40,7 +40,9 @@ object Controller {
         val key = new Key(cmd.key)
         if (Authorizer.authorize(key) == authorization.Status.Success) ClientState.state = new LectureSelect
 
-      case ((ls: LectureSelect), (cmd: SelectLectureCmd)) => ls.lectureNumber = cmd.lectureNumber
+      case ((ls: LectureSelect), (cmd: SelectLectureCmd)) =>
+        ls.lectureNumber = cmd.lectureNumber
+        View.selectLecture(ls.lectureNumber)
       case ((ls: LectureSelect), (cmd: GoForwardCmd)) =>
         ClientState.state = new SlideSelect
         View.slidesView
