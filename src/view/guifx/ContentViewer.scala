@@ -4,21 +4,18 @@ import _root_.controller._
 import scalafx.Includes._
 import scalafx.stage.Stage
 import scalafx.scene.Node
-import scalafx.scene.control.Label
 import scalafx.scene.shape.Rectangle
 import scalafx.scene.paint.Color
 import scalafx.beans.property.{ReadOnlyDoubleProperty, DoubleProperty, IntegerProperty}
 import scalafx.scene.layout.{VBox, HBox, BorderPane}
-import scalafx.scene.control.Button
 import scalafx.scene.image._
 import scalafx.scene.layout.GridPane
-import scalafx.scene.control.TextArea
-
 import javafx.beans.property.{SimpleIntegerProperty, SimpleDoubleProperty}
 import scalafx.scene.layout.BorderPane._
 import javafx.scene.input.MouseEvent
 import javafx.scene.web.HTMLEditor
 import javafx.scene.layout.{RowConstraints, ColumnConstraints}
+import scalafx.scene.control.{Slider, Label, Button, TextArea}
 
 class LecturesViewer extends BorderPane {
   def selectLecture(lectureNum: Int) = {
@@ -153,11 +150,36 @@ class SlidesViewer extends BorderPane {
   val centralImage = new ImageView {
     image = slidesInfo.head.previewPath
     fitWidth <== w - sider_width * 2.0
-    fitHeight <== h - header_height * 2.0
+    fitHeight <== h - header_height * 2.0 - 20
+  }
+
+  val playPauseBtn: Button = new Button {
+    var isPlaying = true
+    text = "|>"
+    minWidth = 35
+    onMouseClicked = ((x: MouseEvent) => {
+      if (isPlaying) playPauseBtn.setText("||")
+      else playPauseBtn.setText("|>")
+      isPlaying = !isPlaying
+    })
+  }
+
+  val hbox = new HBox {
+    content = List(
+      playPauseBtn,
+      new Slider {
+        maxWidth = 100
+        translateX = 20
+      }
+    )
   }
 
   center = new GridPane {
-    content = List((centralImage, 0, 0),
+    content = List((new VBox {
+      content = List(
+        centralImage,
+        hbox)
+    }, 0, 0),
       (new Button {
         text = "<|"
         translateX = 70
