@@ -46,5 +46,7 @@ object View extends JFXApp {
     }
   }
 
+  //stage.setFullScreen(true)
+
   lectureView
 }

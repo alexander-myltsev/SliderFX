@@ -61,7 +61,7 @@ class LecturesViewer extends BorderPane {
       case None => throw new Exception("Lecture with id == 1 is not found.")
     }
     fitWidth <== w - sider_width * 2.0
-    fitHeight <== h - header_height * 2.0
+    fitHeight <== h - header_height * 2.0 - 20
   }
 
   left = new VBox {
@@ -87,7 +87,28 @@ class LecturesViewer extends BorderPane {
   }
 
   center = new GridPane {
-    content = List((centralImage, 0, 0),
+    content = List((new VBox {
+      content = List(centralImage,
+        new HBox {
+          content = List(
+            new Button {
+              text = "Twitter"
+            },
+            new Button {
+              text = "Facebook"
+            },
+            new Button {
+              text = "LinkedIn"
+            },
+            new Button {
+              text = "Youtube"
+            },
+            new Button {
+              text = "RSS"
+            }
+          )
+        })
+    }, 0, 0),
       (new Button {
         text = "|>"
         translateX <== w - sider_width * 2.0 - 70
