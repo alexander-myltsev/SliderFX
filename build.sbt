@@ -77,6 +77,7 @@ initialCommands := """
 //mainClass in (Compile, run) := Some("scalafx.SimpleColorfulCircles")
 mainClass in (Compile, run) := Some("guifx.View")
 //mainClass in (Compile, run) := Some("scalafx.JumpingFrogsPuzzle")
+//mainClass in (Compile, run) := Some("bindingex2.BindingEx2scala")
 
 // add <base>/input to the files that '~' triggers on
 watchSources <+= baseDirectory map {

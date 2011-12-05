@@ -43,4 +43,5 @@ class StringProperty(override val delegate: jfxbp.StringProperty) extends ReadOn
   def value_=(v: String) {
     delegate.set(v)
   }
+
 }

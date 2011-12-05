@@ -230,6 +230,9 @@ abstract class Node extends SFXDelegate[jfxs.Node] {
   }
 
   def opacity = delegate.opacityProperty
+  def opacity_=(v: Double) {
+    opacity() = v
+  }
 
   def parent = delegate.parentProperty
 

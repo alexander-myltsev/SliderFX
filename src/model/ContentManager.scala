@@ -1,10 +1,8 @@
 package model.lectures
 
-case class LectureDescription(id: Int, information: String, previewPath: String)
+import _root_.controller.{SlideInfo, LectureDescription}
 
-case class SlideInfo(id: Int, title: String, previewPath: String)
-
-object LectureManager {
+object ContentManager {
   def getLecturesDescriptions: List[LectureDescription] = {
     val lds = for (lectureNum <- 1 to 4) yield {
       val previewPath = "resource/Lectures/Lecture" + lectureNum + "/Slide1.PNG"
@@ -14,7 +12,7 @@ object LectureManager {
   }
 
   def getSlidesInfo(lectureNum: Int): List[SlideInfo] = {
-    val slds = for (slideNum <- 1 to 23) yield {
+    val slds = for (slideNum <- 1 to 15) yield {
       val previewPath = "resource/Lectures/Lecture" + lectureNum + "/Slide" + slideNum + ".PNG"
       val title = "Slide " + slideNum
       new SlideInfo(slideNum, title, previewPath)

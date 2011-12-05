@@ -1,27 +1,13 @@
 package model
 
-abstract class ClientState {
-  var isWatchingNews = false
-  var isAskingQuestion = false
-}
+class ClientState() {
+  private var _slideNumber = 1
 
-case class Authorization() extends ClientState
+  def slideNumber = _slideNumber
 
-case class LectureSelect() extends ClientState {
-  var lectureNumber = 0
-}
+  def slideNumber_=(v: Int) = _slideNumber = v
 
-object PlaybackStatus extends Enumeration {
-  type PlaybackStatus = Value
-  var Playing, Paused, Stopped = Value
-}
+  // ToDo: Do it for other properties.
 
-case class SlideSelect() extends ClientState {
-  var slideNumber = 0
-  var volume = 0.5
-  var playbackStatus = PlaybackStatus.Playing
-}
-
-object ClientState {
-  var state: ClientState = new LectureSelect
+  var lectureNumber = 1
 }

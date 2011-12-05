@@ -15,4 +15,9 @@ abstract class Labeled extends Control with SFXDelegate[jfxsc.Labeled] {
   def text_=(s:String) {
     text() = s
   }
+
+  def graphic = delegate.graphicProperty
+  def graphic_= (v: Node) {
+    graphic() = v
+  }
 }

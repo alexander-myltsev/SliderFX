@@ -8,7 +8,8 @@ object Label {
   implicit def sfxHBox2jfx(v: Label) = v.delegate
 }
 
-class Label(override val delegate: ctrl.Label = new ctrl.Label()) extends Control with SFXDelegate[ctrl.Label] {
+class Label(override val delegate: ctrl.Label = new ctrl.Label()) extends Labeled with SFXDelegate[ctrl.Label] {
+  /*
   def text = delegate.textProperty
 
   def text_=(v: String) {
@@ -16,4 +17,5 @@ class Label(override val delegate: ctrl.Label = new ctrl.Label()) extends Contro
     //text() = v
     delegate.textProperty.setValue(v)
   }
+  */
 }
