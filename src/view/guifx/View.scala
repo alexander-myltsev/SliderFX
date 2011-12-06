@@ -12,24 +12,12 @@ import scalafx.scene.shape.Rectangle
 import javafx.scene.paint.{Stop, RadialGradient, CycleMethod}
 
 object View extends JFXApp {
-  val fog = new Rectangle {
-    val fogColor = Color.web("#000000")
-    val dark: Color = Color.color(fogColor.getRed, fogColor.getGreen, fogColor.getBlue, 0.7)
-    val light: Color = Color.color(fogColor.getRed, fogColor.getGreen, fogColor.getBlue, 0.5)
-    val gr: RadialGradient = new RadialGradient(0.0, 0.0, 0.5, 0.5, 1.0, true, CycleMethod.NO_CYCLE, new Stop(0, light), new Stop(1, dark))
-
-    width <== scene.width
-    height <== scene.height
-    fill = gr
-    mouseTransparent = true
-  }
-
   stage = new Stage {
-    width = 1350
+    width = 1200
     height = 800
     title = "GUI prototype"
     val _scene = new Scene {
-      fill = WHITESMOKE
+      //fill = WHITESMOKE
       //fill = Color.color(0, 0, 0, 0.7)
       //content = viewer.content
     }

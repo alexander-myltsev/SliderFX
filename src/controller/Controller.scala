@@ -6,7 +6,7 @@ import model.lectures._
 
 abstract class Command
 
-case class WatchNewsCmd(turnOn: Boolean) extends Command
+case class WatchNewsCmd() extends Command
 
 case class AskQuestionCmd(turnOn: Boolean) extends Command
 
@@ -29,6 +29,10 @@ class Controller(clientState: ClientState) {
     println("===> executeCommand: " + viewer.state + " | " + command)
 
     (command) match {
+      case (cmd: WatchNewsCmd) =>
+        val news = InformationProvider.getNews
+        viewer.updateNews(news map (_.content))
+
       case (cmd: AuthorizeCmd) =>
         val key = new Key(cmd.key)
         val status = Authorizer.authorize(key)

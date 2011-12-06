@@ -10,5 +10,8 @@ object TextArea {
 }
 
 class TextArea(override val delegate: jfxsc.TextArea = new jfxsc.TextArea()) extends TextInputControl with SFXDelegate[jfxsc.TextArea] {
-
+  def wrapText_=(v: Boolean) = {
+    wrapText() = v
+  }
+  def wrapText = delegate.wrapTextProperty
 }

@@ -14,4 +14,9 @@ abstract class TextInputControl extends Control with SFXDelegate[jfxsc.TextInput
   def text_=(v: String) {
     text() = v
   }
+
+  def editable = delegate.editableProperty
+  def editable_=(v: Boolean) = {
+    editable() = v
+  }
 }

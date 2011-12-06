@@ -14,6 +14,10 @@ class ImageView(override val delegate: img.ImageView = new img.ImageView()) exte
   def image_=(url: String) {
     image() = new img.Image(url)
   }
+  def image_=(param: (String, Double, Double)) {
+    val (url, requestedWidth, requestedHeight) = param
+    image() = new img.Image(url, requestedWidth, requestedHeight, true, true, true)
+  }
 
   def fitWidth = delegate.fitWidthProperty
   def fitWidth_=(w: Double) {
@@ -23,5 +27,10 @@ class ImageView(override val delegate: img.ImageView = new img.ImageView()) exte
   def fitHeight = delegate.fitHeightProperty
   def fitHeight_=(h: Double) {
     fitHeight() = h
+  }
+
+  def preserveRatio = delegate.preserveRatioProperty
+  def preserveRatio_=(v: Boolean) = {
+    preserveRatio() = v
   }
 }

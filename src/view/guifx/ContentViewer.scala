@@ -5,7 +5,6 @@ import scalafx.Includes._
 import scalafx.scene.shape.Rectangle
 import scalafx.scene.paint.Color
 import scalafx.scene.layout.{VBox, HBox, BorderPane}
-import scalafx.scene.image._
 import scalafx.scene.layout.GridPane
 import scalafx.scene.control.{Slider, Button, TextArea}
 import scalafx.scene.Scene
@@ -15,50 +14,103 @@ import javafx.scene.control.Tooltip
 import javafx.beans.property.{SimpleIntegerProperty, SimpleDoubleProperty}
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.{RowConstraints}
+import scalafx.geometry.Insets
+import javafx.scene.paint.{Stop, CycleMethod, RadialGradient}
+import scalafx.scene.paint.Color._
+import javafx.geometry.Pos
+import scalafx.scene.image._
+import scalafx.scene.image.ImageView._
 
 class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   viewer =>
 
-  //def getController = controller
+  val lectureNumber = new IntegerProperty(new SimpleIntegerProperty(1))
+  var news = ""
+  controller.executeCommand(viewer, new WatchNewsCmd)
+
+  def updateNews(news: List[String]) = {
+    viewer.news = news.mkString("\n\n")
+  }
 
   def setLecture(lectureNum: Int) = {
-    decorateForLecturing(lectureNum)
+    //decorateForLecturing(lectureNum)
+    lectureNumber() = lectureNum
   }
 
   def setSlide(slideNum: Int) = {
     decorateForSliding(slideNum)
   }
 
-  def updateNews(news: List[String]) = {
-    println("Viewer.updateNews")
-  }
-
-  val header_height = new SimpleDoubleProperty(5.0)
-  val sider_width = new SimpleDoubleProperty(200.0)
+  //val header_height = new SimpleDoubleProperty(5.0)
+  //val sider_width = new SimpleDoubleProperty(200.0)
+  val banner_width = 200.
 
   decorateForLecturing(1)
 
-  def sendMsg = new TextArea {
-    val msg = "Type your question or query here and click \"send\" to receive \na consultation"
-    text = msg
-    tooltip = new Tooltip(msg)
-    translateY <== scene.height - this.height - 40.0
-    maxWidth <== sider_width * 2.0 - 10
 
-    onMouseEntered = ((x: MouseEvent) => {
-      if (this.text() == msg) this.text = ""
-    })
+  def rightPane = new VBox {
+    alignment = Pos.TOP_RIGHT
 
-    onMouseExited = ((x: MouseEvent) => {
-      if (this.text() == "") this.text = msg
-    })
+    val questionTextArea = new TextArea {
+      val msg = "Type your question or query here and click \"send\" to receive a consultation"
+      text = msg
+      //tooltip = new Tooltip(msg)
+      //maxWidth <== sider_width * 2.0 - 10
+
+      onMouseEntered = ((x: MouseEvent) => {
+        if (this.text() == msg) this.text = ""
+      })
+
+      onMouseExited = ((x: MouseEvent) => {
+        if (this.text() == "") this.text = msg
+      })
+
+      prefWidth = banner_width
+      wrapText = true
+    }
+
+    content = List(
+      new ImageView {
+        //image = ("resource/TESLA_20Series-WBA_200x100_pic.jpg", 200., 100.)
+        image = "resource/TESLA_20Series-WBA_200x100_pic.jpg"
+        //fitWidth = 200
+      },
+      new TextArea {
+        text = news
+        prefWidth = banner_width
+        prefHeight = 400
+        wrapText = true
+        editable = false
+      },
+      questionTextArea,
+      new Button {
+        text = "Send"
+        translateX = -5
+        translateY = -10
+        onMouseClicked = ((x: MouseEvent) => {
+          println("DEBUG: Question is sent: " + questionTextArea.text())
+        })
+      })
   }
 
   def decorateForLecturing(lectureNum: Int) = {
-    val w = scene.width
-    val h = scene.height
-    val content = new BorderPane
-    scene.content = List(content)
+    val fog = new Rectangle {
+      val fogColor = Color.web("#000000")
+      val dark: Color = Color.color(fogColor.getRed, fogColor.getGreen, fogColor.getBlue, 1.0)
+      val light: Color = Color.color(fogColor.getRed, fogColor.getGreen, fogColor.getBlue, 0.5)
+      val gr: RadialGradient = new RadialGradient(0.0, 0.0, 0.5, 0.5, 0.5, true, CycleMethod.NO_CYCLE, new Stop(0, light), new Stop(1, dark))
+
+      width <== scene.width
+      height <== scene.height
+      fill = gr
+      mouseTransparent = true
+    }
+
+    val content = new BorderPane {
+      prefWidth <== scene.width
+      prefHeight <== scene.height
+    }
+    scene.content = List(fog, content)
 
     val lecturesDescriptions = {
       val cmd = new GetLecturesDescriptionsCmd
@@ -66,152 +118,180 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
       cmd.lecturesDescriptions
     }
 
+    /*
     val centralImage = new ImageView {
       image = lecturesDescriptions.find(_.id == lectureNum) match {
         case Some(x) => x.previewPath
         case None => throw new Exception("Lecture with id == " + lectureNum + " is not found.")
       }
-      fitWidth <== w - sider_width * 2.0
-      fitHeight <== h - header_height * 2.0 - 30
+      //translateX <== (scene.width - this.comp - banner_width) / 2.0
+      //translateY = 20
+      //fitWidth <== scene.width - banner_width
+      //fitHeight <== h - header_height * 2.0 - 100
+      //maxWidth <== this.image().width()
+
+      preserveRatio = true
     }
 
+
     def selectLecture(lectureNum: Int) = {
-      // TODO: simplify centralImage.image.value
       val path = lecturesDescriptions.find(_.id == lectureNum) match {
         case Some(x) => x.previewPath
         case None => throw new Exception("Lecture with id == " + lectureNum + " is not found.")
       }
-      centralImage.image.value = new javafx.scene.image.Image(path)
+      centralImage.image() = new javafx.scene.image.Image(path)
     }
+    */
 
     val thumbnailHeight = 150.0
     val thumbnailWidth = 150.0
     val thumbnailSpacing = 10.0
 
-    content.bottom = new HBox {
-      content = for (ls <- lecturesDescriptions) yield {
-        new Button {
-          minWidth = 150
-          text = ls.information
-
-          onMouseClicked = ((x: MouseEvent) => {
-            // TODO: move this multiple instanced handler to one handler
-            println("DEBUG: lecture selected - " + ls.id)
-            controller.executeCommand(viewer, new SelectLectureCmd(ls.id))
-          })
-        }
-      }
-
-      translateX = 40
-      translateY = 5
-      spacing = thumbnailSpacing
-    }
-
+    /*
     content.top = new Rectangle {
       width <== w
       height <== header_height
       fill = Color.web("#0000FF")
     }
+    */
 
-    content.center = new GridPane {
-      content = List((centralImage, 0, 0),
-        (new ImageView {
-          //text = "|>"
-          translateX <== w / 2.0 - sider_width - 120
-          translateY <== -50 //h / 2.0 - header_height - 70
-          opacity = 0.7
+    content.center = new VBox {
+      prefWidth <== scene.width - banner_width
+      prefHeight <== scene.height
+      spacing = 20.
+      translateY = 20
+      translateX = 20
 
-          image = "resource/Silver-Play-Button.jpg"
-
-          maxWidth = 10
-          maxHeight = 10
-
-          onMouseClicked = ((x: MouseEvent) => {
-            println("DEBUG: |> - View slides")
-            controller.executeCommand(viewer, new GoForwardCmd)
-          })
-        }, 0, 0))
-    }
-
-    // TODO: Fix bug when goback from slides
-    val gp = new GridPane {
       content = List(
-        (sendMsg, 0, 0),
-        (new Button {
-          text = "Send"
-          translateX = 320
-          translateY <== h - 190
-          onMouseClicked = ((x: MouseEvent) => {
-            println("DEBUG: Question is sent")
-          })
-        }, 0, 0),
-        (new ImageView {
-          image = "resource/NV_CUDAZONE.jpg"
-          fitHeight = 200
-          translateY = 0
-        }, 0, 0),
-        (new TextArea {
-          text = """
-News #1
-News #2
-News #3
-"""
-          translateY = 220
-          minHeight = 250
-        }, 0, 0),
-        (new HBox {
-          content = List(
-            new Button {
-              graphic = new ImageView {
-                image = "resource/Twitter-icon.png"
-                fitHeight = 30
-                fitWidth = 30
-              }
-              maxWidth = 30
-              maxHeight = 30
-            },
-            new Button {
-              graphic = new ImageView {
-                image = "resource/facebook-icon.png"
-                fitHeight = 30
-                fitWidth = 30
-              }
-              maxWidth = 30
-              maxHeight = 30
-            }
-            /*,
-            new Button {
-              text = "LinkedIn"
-            },
-            new Button {
-              text = "Youtube"
-            },
-            new Button {
-              text = "RSS"
-            }*/
-          )
+        new GridPane {
+          gridPane =>
 
-          translateY <== h - 35
-          translateX <== 300
-        }, 0, 0))
+          val centralImage = new ImageView {
+            image = lecturesDescriptions.find(_.id == lectureNum) match {
+              case Some(x) => x.previewPath
+              case None => throw new Exception("Lecture with id == " + lectureNum + " is not found.")
+            }
+            //translateX = 20
+            fitWidth <== scene.width - banner_width - 40
+            fitHeight <== scene.height - 100
+            //maxWidth <== scene.width - banner_width
+            //maxHeight <== scene.height
+
+            preserveRatio = true
+          }
+
+
+          //println("lecture changed to " + newValue)
+
+          //lectureNumber.addListener((obs: ObservableValue[_ <: Int], oldV: Int, newV: Int) => {
+          lectureNumber onChange {
+            (prop, oldVal, newVal) => {
+              //println("lecture changed to " + newVal)
+              if (oldVal != newVal) {
+                val path = lecturesDescriptions.find(_.id == newVal.intValue) match {
+                  case Some(x) => x.previewPath
+                  case None => throw new Exception("Lecture with id == " + lectureNum + " is not found.")
+                }
+                centralImage.image_=(path)
+              }
+            }
+          }
+
+          content = List(
+            centralImage,
+            new ImageView {
+              translateX <== 200
+              //translateY <== -50 //h / 2.0 - header_height - 70
+              opacity = 0.2
+
+              image = "resource/Silver-Play-Button.jpg"
+
+              fitHeight = 100
+              fitWidth = 100
+
+              onMouseClicked = ((x: MouseEvent) => {
+                println("DEBUG: |> - View slides")
+                controller.executeCommand(viewer, new GoForwardCmd)
+                //println("gridPane = (" + gridPane.width() + ", " + gridPane.height() + ")")
+                //println("centralImage = (" + centralImage.fitWidth() + ", " + centralImage.fitHeight() + ")")
+              })
+            })
+        })
     }
 
-    // TODO: Simplify it
-    val rc = new RowConstraints()
-    rc.setMinHeight(150)
-    gp.rowConstraints.addAll(rc)
-    content.right = gp
+    content.bottom = new VBox {
+      prefWidth <== scene.width
 
+      content = List(
+        new HBox {
+          translateX = 30
+
+          val lectureButtons = for (ls <- lecturesDescriptions) yield {
+            new Button {
+              minWidth = 150
+              text = ls.information
+
+              onMouseClicked = ((x: MouseEvent) => {
+                // TODO: move this multiple instanced handler to one handler
+                println("DEBUG: lecture selected - " + ls.id)
+                controller.executeCommand(viewer, new SelectLectureCmd(ls.id))
+              })
+            }
+          }
+
+          content = lectureButtons
+          alignment = Pos.BOTTOM_LEFT
+          spacing = thumbnailSpacing
+        },
+        new HBox {
+          val twitterButton = new Button {
+            graphic = new ImageView {
+              image = "resource/Twitter-icon.png"
+              fitHeight = 32
+              fitWidth = 32
+            }
+            maxWidth = 32
+            maxHeight = 32
+          }
+          val facebookButton = new Button {
+            graphic = new ImageView {
+              image = "resource/facebook-icon.png"
+              fitHeight = 32
+              fitWidth = 32
+            }
+            maxWidth = 32
+            maxHeight = 32
+          }
+          /*,
+          new Button {
+            text = "LinkedIn"
+          },
+          new Button {
+            text = "Youtube"
+          },
+          new Button {
+            text = "RSS"
+          }*/
+
+          content = List(twitterButton, facebookButton)
+          alignment = Pos.BOTTOM_RIGHT
+        })
+
+      //translateX = 40
+      //translateY <== this.height - 10
+      padding = Insets(5, 5, 5, 5)
+    }
+
+    content.right = rightPane
   }
 
   def decorateForSliding(slideNum: Int) = {
     val w = scene.width
     val h = scene.height
-    val content = new BorderPane
+    val content = new BorderPane {
+      //padding = Insets(50, 50, 50, 50)
+    }
     scene.content = List(content)
-    //val sider_width = viewer.sider_width
-    //val header_height = viewer.header_height
-    //val controller = viewer.getController
 
     val slidesInfo = {
       val cmd = new GetSlidesCmd(1)
@@ -221,8 +301,8 @@ News #3
 
     val centralImage = new ImageView {
       image = slidesInfo.head.previewPath
-      fitWidth <== w - sider_width * 2.0
-      fitHeight <== h - header_height * 2.0 - 20
+      //fitWidth <== w - sider_width * 2.0
+      //fitHeight <== h - header_height * 2.0 - 20
     }
 
     def selectSlide(slideNum: Int): Unit = {
@@ -281,7 +361,7 @@ News #3
         (new Button {
           text = "<|"
           translateX = -130
-          translateY <== h / 2.0 - header_height - 10
+          //translateY <== h / 2.0 - header_height - 10
           onMouseClicked = mouseClickedHandler((_: MouseEvent))
 
           def mouseClickedHandler(x: MouseEvent) = {
@@ -335,29 +415,22 @@ News #3
       spacing = thumbnailSpacing
     }
 
+    /*
     content.bottom = new Rectangle {
       width <== w
       height <== header_height
       fill = Color.web("#0000FF")
     }
+    */
 
+    /*
     content.top = new Rectangle {
       width <== w
       height <== header_height
       fill = Color.web("#0000FF")
     }
+    */
 
-    // TODO: remove code duplication with LectureViewer
-    // TODO: Fix bug when goback from slides
-    val gp = new GridPane {
-      content = List(
-        (sendMsg, 0, 0))
-    }
-
-    // TODO: Simplify it
-    val rc = new RowConstraints()
-    rc.setMinHeight(150)
-    gp.rowConstraints.addAll(rc)
-    content.right = gp
+    content.right = rightPane
   }
 }
