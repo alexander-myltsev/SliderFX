@@ -51,18 +51,18 @@ class Controller(clientState: ClientState) {
       case (cmd: GoBackCmd) if viewer.state == ViewerState.Authorizing =>
         throw new Exception("Can't go back while ViewerState.Authorizing")
       case (cmd: GoBackCmd) if viewer.state == ViewerState.SelectingLecture =>
-        viewer.state = ViewerState.SelectingLecture
-        viewer.setLecture(clientState.lectureNumber)
-      case (cmd: GoBackCmd) if viewer.state == ViewerState.SelectingSlides =>
-        viewer.state = ViewerState.SelectingSlides
+        //viewer.state = ViewerState.SelectingSlides
         viewer.setSlide(clientState.slideNumber)
+      case (cmd: GoBackCmd) if viewer.state == ViewerState.SelectingSlides =>
+        //viewer.state = ViewerState.SelectingLecture
+        viewer.setLecture(clientState.lectureNumber)
 
 
       case (cmd: GoForwardCmd) if viewer.state == ViewerState.Authorizing =>
-        viewer.state = ViewerState.SelectingLecture
+        //viewer.state = ViewerState.SelectingLecture
         viewer.setLecture(clientState.lectureNumber)
       case (cmd: GoForwardCmd) if viewer.state == ViewerState.SelectingLecture =>
-        viewer.state = ViewerState.SelectingSlides
+        //viewer.state = ViewerState.SelectingSlides
         viewer.setSlide(clientState.slideNumber)
       case (cmd: GoForwardCmd) if viewer.state == ViewerState.SelectingSlides =>
         throw new Exception("Can't go forward while ViewerState.SelectingSlides")

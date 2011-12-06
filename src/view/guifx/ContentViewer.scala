@@ -34,6 +34,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   }
 
   val lectureNumber = new IntegerProperty(new SimpleIntegerProperty(1))
+  val slideNumber = new IntegerProperty(new SimpleIntegerProperty(1))
   var news = ""
   controller.executeCommand(viewer, new WatchNewsCmd)
 
@@ -59,7 +60,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
     }
     */
 
-    // TODO: LinkedIn, Youtube, RSS
+    // TODO: Add LinkedIn, Youtube, RSS social buttons
 
     val twitterButton = new ImageView {
       image = "resource/Twitter-icon.png"
@@ -88,12 +89,23 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   }
 
   def setLecture(lectureNum: Int) = {
-    //decorateForLecturing(lectureNum)
+    println("state: " + viewer.state)
+    if (viewer.state != ViewerState.SelectingLecture) {
+      println("!!!recreated!!!")
+      decorateForLecturing(lectureNum)
+      viewer.state = ViewerState.SelectingLecture
+    }
     lectureNumber() = lectureNum
   }
 
   def setSlide(slideNum: Int) = {
-    decorateForSliding(slideNum)
+    //println("state: " + viewer.state)
+    if (viewer.state != ViewerState.SelectingSlides) {
+      println("!!!recreated!!!")
+      decorateForSliding(slideNum)
+      viewer.state = ViewerState.SelectingSlides
+    }
+    slideNumber() = slideNum
   }
 
   val banner_width = 200.
@@ -195,7 +207,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
                   case Some(x) => x.previewPath
                   case None => throw new Exception("Lecture with id == " + lectureNum + " is not found.")
                 }
-                centralImage.image = (path)
+                centralImage.image = path
               }
             }
           }
@@ -203,7 +215,9 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
           content = List(
             centralImage,
             new ImageView {
-              translateX = 200
+              //translateX <== centralImage.image().widthProperty / 2.
+              translateX = 20
+              translateY = -20
               opacity = 0.2
 
               image = "resource/Silver-Play-Button.jpg"
@@ -212,7 +226,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
               fitWidth = 100.
 
               onMouseClicked = ((x: MouseEvent) => {
-                println("DEBUG: |> - View slides")
+                println("DEBUG: View slides")
                 controller.executeCommand(viewer, new GoForwardCmd)
               })
             })
@@ -277,6 +291,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
       preserveRatio = true
     }
 
+    /*
     def selectSlide(slideNum: Int): Unit = {
       // TODO: simplify centralImage.image.value
       val path = slidesInfo.find(_.id == slideNum) match {
@@ -284,6 +299,19 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
         case None => throw new Exception("Slide with id == " + slideNum + " is not found.")
       }
       centralImage.image.value = new javafx.scene.image.Image(path)
+    }
+    */
+
+    slideNumber onChange {
+      (prop, oldVal, newVal) => {
+        if (oldVal != newVal) {
+          val path = slidesInfo.find(_.id == newVal.intValue) match {
+            case Some(x) => x.previewPath
+            case None => throw new Exception("Slide with id == " + slideNum + " is not found.")
+          }
+          centralImage.image = path
+        }
+      }
     }
 
     val slideNavigationBox = new HBox {
@@ -348,16 +376,22 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
       //      }
 
       def update(si: SlideInfo): Unit = {
+        val pointer = "--->"
         buttons foreach ((b: Button) => {
-          b.minHeight.set(thumbnailHeight)
-          b.graphic() = null
+          b.minHeight() = thumbnailHeight
+          b.graphic() = null // TODO: All except two are actually non-null
+
+          val txt = b.text()
+          if (txt.endsWith(pointer)) b.text() = txt.substring(0, txt.length - pointer.length)
         })
-        for (i <- si.id - 3 to si.id + 1) {
-          if (i >= 0 && i < buttons.length) {
+        buttons(si.id - 1).text() += pointer
+        //for (i <- si.id - 3 to si.id + 1) {
+        for (i <- si.id - 2 to si.id) {
+          if (i >= 0 && i < buttons.length && i + 1 != si.id) {
             val button = buttons(i)
             button.setMinHeight(thumbnailHeight + 50)
             button.graphic = new ImageView {
-              image = si.previewPath
+              image = slidesInfo(i).previewPath // TODO: fix it
               fitWidth = 70
               fitHeight = 70
             }
@@ -369,7 +403,6 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
         new Button {
           text = si.title
           minWidth = thumbnailWidth
-
 
           onMouseClicked = ((x: MouseEvent) => {
             // TODO: move this multiple instanced handler to one handler
@@ -393,14 +426,6 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
         socialButtons
       )
     }
-
-    /*
-    content.top = new Rectangle {
-      width <== w
-      height <== header_height
-      fill = Color.web("#0000FF")
-    }
-    */
 
     content.right = rightPane
   }

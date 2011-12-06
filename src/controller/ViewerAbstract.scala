@@ -1,12 +1,16 @@
 package controller
 
 object ViewerState extends Enumeration {
-  type ViewerState = Value
+  type t = Value
   var Authorizing, SelectingLecture, SelectingSlides = Value
 }
 
 abstract class ViewerAbstract {
-  var state = ViewerState.SelectingLecture
+  private var _state = ViewerState.SelectingLecture
+  def state = _state
+  def state_=(v: ViewerState.t) = {
+    _state = v
+  }
 
   def setLecture(lectureNum: Int)
 
