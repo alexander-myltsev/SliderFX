@@ -16,21 +16,12 @@ object View extends JFXApp {
     width = 1200
     height = 800
     title = "GUI prototype"
-    val _scene = new Scene {
-      //fill = WHITESMOKE
-      //fill = Color.color(0, 0, 0, 0.7)
-      //content = viewer.content
-    }
+    val _scene = new Scene
     scene = _scene
 
-    val controller = new Controller(new ClientState) // TODO: fix this dependency
-    val viewer = new Viewer(controller, _scene) {
-      //w <== scene.width
-      //h <== scene.height
-    }
+    val controller = new Controller(new ClientState)
+    val viewer = new Viewer(controller, _scene)
   }
 
-  //stage.setFullScreen(true)
-
-  //lectureView
+  stage.setFullScreen(true)
 }

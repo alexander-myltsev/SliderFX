@@ -8,18 +8,15 @@ import scalafx.scene.layout.{VBox, HBox, BorderPane}
 import scalafx.scene.layout.GridPane
 import scalafx.scene.control.{Slider, Button, TextArea}
 import scalafx.scene.Scene
-import scalafx.beans.property.{ReadOnlyObjectProperty, DoubleProperty, IntegerProperty}
-
-import javafx.scene.control.Tooltip
-import javafx.beans.property.{SimpleIntegerProperty, SimpleDoubleProperty}
-import javafx.scene.input.MouseEvent
-import javafx.scene.layout.{RowConstraints}
+import scalafx.beans.property.{IntegerProperty}
 import scalafx.geometry.Insets
-import javafx.scene.paint.{Stop, CycleMethod, RadialGradient}
 import scalafx.scene.paint.Color._
-import javafx.geometry.Pos
 import scalafx.scene.image._
-import scalafx.scene.image.ImageView._
+
+import javafx.beans.property.{SimpleIntegerProperty}
+import javafx.scene.input.MouseEvent
+import javafx.scene.paint.{Stop, CycleMethod, RadialGradient}
+import javafx.geometry.Pos
 
 class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   viewer =>
@@ -41,17 +38,15 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
     decorateForSliding(slideNum)
   }
 
-  //val header_height = new SimpleDoubleProperty(5.0)
-  //val sider_width = new SimpleDoubleProperty(200.0)
   val banner_width = 200.
 
   decorateForLecturing(1)
-
 
   def rightPane = new VBox {
     alignment = Pos.TOP_RIGHT
 
     val questionTextArea = new TextArea {
+      prefHeight <== scene.height * 0.3
       val msg = "Type your question or query here and click \"send\" to receive a consultation"
       text = msg
       //tooltip = new Tooltip(msg)
@@ -78,7 +73,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
       new TextArea {
         text = news
         prefWidth = banner_width
-        prefHeight = 400
+        prefHeight <== scene.height * 0.4
         wrapText = true
         editable = false
       },
@@ -88,7 +83,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
         translateX = -5
         translateY = -10
         onMouseClicked = ((x: MouseEvent) => {
-          println("DEBUG: Question is sent: " + questionTextArea.text())
+          println("DEBUG: Question is sent: '" + questionTextArea.text() + "'")
         })
       })
   }
@@ -112,55 +107,20 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
     }
     scene.content = List(fog, content)
 
+    val thumbnailSpacing = 10.
+
     val lecturesDescriptions = {
       val cmd = new GetLecturesDescriptionsCmd
       controller.executeCommand(viewer, cmd)
       cmd.lecturesDescriptions
     }
 
-    /*
-    val centralImage = new ImageView {
-      image = lecturesDescriptions.find(_.id == lectureNum) match {
-        case Some(x) => x.previewPath
-        case None => throw new Exception("Lecture with id == " + lectureNum + " is not found.")
-      }
-      //translateX <== (scene.width - this.comp - banner_width) / 2.0
-      //translateY = 20
-      //fitWidth <== scene.width - banner_width
-      //fitHeight <== h - header_height * 2.0 - 100
-      //maxWidth <== this.image().width()
-
-      preserveRatio = true
-    }
-
-
-    def selectLecture(lectureNum: Int) = {
-      val path = lecturesDescriptions.find(_.id == lectureNum) match {
-        case Some(x) => x.previewPath
-        case None => throw new Exception("Lecture with id == " + lectureNum + " is not found.")
-      }
-      centralImage.image() = new javafx.scene.image.Image(path)
-    }
-    */
-
-    val thumbnailHeight = 150.0
-    val thumbnailWidth = 150.0
-    val thumbnailSpacing = 10.0
-
-    /*
-    content.top = new Rectangle {
-      width <== w
-      height <== header_height
-      fill = Color.web("#0000FF")
-    }
-    */
-
     content.center = new VBox {
       prefWidth <== scene.width - banner_width
       prefHeight <== scene.height
       spacing = 20.
-      translateY = 20
-      translateX = 20
+      translateY = 20.
+      translateX = 20.
 
       content = List(
         new GridPane {
@@ -171,28 +131,20 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
               case Some(x) => x.previewPath
               case None => throw new Exception("Lecture with id == " + lectureNum + " is not found.")
             }
-            //translateX = 20
-            fitWidth <== scene.width - banner_width - 40
-            fitHeight <== scene.height - 100
-            //maxWidth <== scene.width - banner_width
-            //maxHeight <== scene.height
+            fitWidth <== scene.width - banner_width - 40.
+            fitHeight <== scene.height - 100.
 
             preserveRatio = true
           }
 
-
-          //println("lecture changed to " + newValue)
-
-          //lectureNumber.addListener((obs: ObservableValue[_ <: Int], oldV: Int, newV: Int) => {
           lectureNumber onChange {
             (prop, oldVal, newVal) => {
-              //println("lecture changed to " + newVal)
               if (oldVal != newVal) {
                 val path = lecturesDescriptions.find(_.id == newVal.intValue) match {
                   case Some(x) => x.previewPath
                   case None => throw new Exception("Lecture with id == " + lectureNum + " is not found.")
                 }
-                centralImage.image_=(path)
+                centralImage.image = (path)
               }
             }
           }
@@ -200,20 +152,17 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
           content = List(
             centralImage,
             new ImageView {
-              translateX <== 200
-              //translateY <== -50 //h / 2.0 - header_height - 70
+              translateX = 200
               opacity = 0.2
 
               image = "resource/Silver-Play-Button.jpg"
 
-              fitHeight = 100
-              fitWidth = 100
+              fitHeight = 100.
+              fitWidth = 100.
 
               onMouseClicked = ((x: MouseEvent) => {
                 println("DEBUG: |> - View slides")
                 controller.executeCommand(viewer, new GoForwardCmd)
-                //println("gridPane = (" + gridPane.width() + ", " + gridPane.height() + ")")
-                //println("centralImage = (" + centralImage.fitWidth() + ", " + centralImage.fitHeight() + ")")
               })
             })
         })
@@ -224,11 +173,11 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
 
       content = List(
         new HBox {
-          translateX = 30
+          translateX = 30.
 
           val lectureButtons = for (ls <- lecturesDescriptions) yield {
             new Button {
-              minWidth = 150
+              minWidth = 150.
               text = ls.information
 
               onMouseClicked = ((x: MouseEvent) => {
@@ -244,6 +193,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
           spacing = thumbnailSpacing
         },
         new HBox {
+          /*
           val twitterButton = new Button {
             graphic = new ImageView {
               image = "resource/Twitter-icon.png"
@@ -262,23 +212,32 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
             maxWidth = 32
             maxHeight = 32
           }
-          /*,
-          new Button {
-            text = "LinkedIn"
-          },
-          new Button {
-            text = "Youtube"
-          },
-          new Button {
-            text = "RSS"
-          }*/
+          */
+
+          // TODO: LinkedIn, Youtube, RSS
+
+          val twitterButton = new ImageView {
+            image = "resource/Twitter-icon.png"
+            fitHeight = 32
+            fitWidth = 32
+            onMouseClicked = ((x: MouseEvent) => {
+              println("DEBUG: twitter button is clicked")
+            })
+          }
+
+          val facebookButton = new ImageView {
+            image = "resource/facebook-icon.png"
+            fitHeight = 32
+            fitWidth = 32
+            onMouseClicked = ((x: MouseEvent) => {
+              println("DEBUG: facebook button is clicked")
+            })
+          }
 
           content = List(twitterButton, facebookButton)
           alignment = Pos.BOTTOM_RIGHT
         })
 
-      //translateX = 40
-      //translateY <== this.height - 10
       padding = Insets(5, 5, 5, 5)
     }
 
