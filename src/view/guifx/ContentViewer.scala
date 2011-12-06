@@ -21,9 +21,67 @@ import javafx.geometry.Pos
 class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   viewer =>
 
+  val fog = new Rectangle {
+    val fogColor = Color.web("#000000")
+    val dark: Color = Color.color(fogColor.getRed, fogColor.getGreen, fogColor.getBlue, 1.0)
+    val light: Color = Color.color(fogColor.getRed, fogColor.getGreen, fogColor.getBlue, 0.5)
+    val gr: RadialGradient = new RadialGradient(0.0, 0.0, 0.5, 0.5, 0.5, true, CycleMethod.NO_CYCLE, new Stop(0, light), new Stop(1, dark))
+
+    width <== scene.width
+    height <== scene.height
+    fill = gr
+    mouseTransparent = true
+  }
+
   val lectureNumber = new IntegerProperty(new SimpleIntegerProperty(1))
   var news = ""
   controller.executeCommand(viewer, new WatchNewsCmd)
+
+  val socialButtons = new HBox {
+    /*
+    val twitterButton = new Button {
+      graphic = new ImageView {
+        image = "resource/Twitter-icon.png"
+        fitHeight = 32
+        fitWidth = 32
+      }
+      maxWidth = 32
+      maxHeight = 32
+    }
+    val facebookButton = new Button {
+      graphic = new ImageView {
+        image = "resource/facebook-icon.png"
+        fitHeight = 32
+        fitWidth = 32
+      }
+      maxWidth = 32
+      maxHeight = 32
+    }
+    */
+
+    // TODO: LinkedIn, Youtube, RSS
+
+    val twitterButton = new ImageView {
+      image = "resource/Twitter-icon.png"
+      fitHeight = 32
+      fitWidth = 32
+      onMouseClicked = ((x: MouseEvent) => {
+        println("DEBUG: twitter button is clicked")
+      })
+    }
+
+    val facebookButton = new ImageView {
+      image = "resource/facebook-icon.png"
+      fitHeight = 32
+      fitWidth = 32
+      onMouseClicked = ((x: MouseEvent) => {
+        println("DEBUG: facebook button is clicked")
+      })
+    }
+
+    content = List(twitterButton, facebookButton)
+    alignment = Pos.BOTTOM_RIGHT
+  }
 
   def updateNews(news: List[String]) = {
     viewer.news = news.mkString("\n\n")
@@ -46,6 +104,8 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
     alignment = Pos.TOP_RIGHT
 
     val questionTextArea = new TextArea {
+      padding = Insets(20, 0, 0, 0)
+
       prefHeight <== scene.height * 0.3
       val msg = "Type your question or query here and click \"send\" to receive a consultation"
       text = msg
@@ -68,6 +128,9 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
       new ImageView {
         //image = ("resource/TESLA_20Series-WBA_200x100_pic.jpg", 200., 100.)
         image = "resource/TESLA_20Series-WBA_200x100_pic.jpg"
+        onMouseClicked = ((x: MouseEvent) => {
+          println("DEBUG: TESLA_20Series is clicked")
+        })
         //fitWidth = 200
       },
       new TextArea {
@@ -89,18 +152,6 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   }
 
   def decorateForLecturing(lectureNum: Int) = {
-    val fog = new Rectangle {
-      val fogColor = Color.web("#000000")
-      val dark: Color = Color.color(fogColor.getRed, fogColor.getGreen, fogColor.getBlue, 1.0)
-      val light: Color = Color.color(fogColor.getRed, fogColor.getGreen, fogColor.getBlue, 0.5)
-      val gr: RadialGradient = new RadialGradient(0.0, 0.0, 0.5, 0.5, 0.5, true, CycleMethod.NO_CYCLE, new Stop(0, light), new Stop(1, dark))
-
-      width <== scene.width
-      height <== scene.height
-      fill = gr
-      mouseTransparent = true
-    }
-
     val content = new BorderPane {
       prefWidth <== scene.width
       prefHeight <== scene.height
@@ -192,51 +243,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
           alignment = Pos.BOTTOM_LEFT
           spacing = thumbnailSpacing
         },
-        new HBox {
-          /*
-          val twitterButton = new Button {
-            graphic = new ImageView {
-              image = "resource/Twitter-icon.png"
-              fitHeight = 32
-              fitWidth = 32
-            }
-            maxWidth = 32
-            maxHeight = 32
-          }
-          val facebookButton = new Button {
-            graphic = new ImageView {
-              image = "resource/facebook-icon.png"
-              fitHeight = 32
-              fitWidth = 32
-            }
-            maxWidth = 32
-            maxHeight = 32
-          }
-          */
-
-          // TODO: LinkedIn, Youtube, RSS
-
-          val twitterButton = new ImageView {
-            image = "resource/Twitter-icon.png"
-            fitHeight = 32
-            fitWidth = 32
-            onMouseClicked = ((x: MouseEvent) => {
-              println("DEBUG: twitter button is clicked")
-            })
-          }
-
-          val facebookButton = new ImageView {
-            image = "resource/facebook-icon.png"
-            fitHeight = 32
-            fitWidth = 32
-            onMouseClicked = ((x: MouseEvent) => {
-              println("DEBUG: facebook button is clicked")
-            })
-          }
-
-          content = List(twitterButton, facebookButton)
-          alignment = Pos.BOTTOM_RIGHT
-        })
+        socialButtons)
 
       padding = Insets(5, 5, 5, 5)
     }
@@ -245,23 +252,29 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   }
 
   def decorateForSliding(slideNum: Int) = {
-    val w = scene.width
-    val h = scene.height
+    val thumbnailHeight = 20.0
+    val thumbnailWidth = 150.0
+    val thumbnailSpacing = 5.0
+
     val content = new BorderPane {
-      //padding = Insets(50, 50, 50, 50)
+      prefWidth <== scene.width
+      prefHeight <== scene.height
     }
-    scene.content = List(content)
+    scene.content = List(fog, content)
 
     val slidesInfo = {
-      val cmd = new GetSlidesCmd(1)
+      val cmd = new GetSlidesCmd(lectureNumber())
       controller.executeCommand(viewer, cmd)
       cmd.slidesInfo
     }
 
     val centralImage = new ImageView {
       image = slidesInfo.head.previewPath
-      //fitWidth <== w - sider_width * 2.0
-      //fitHeight <== h - header_height * 2.0 - 20
+
+      fitWidth <== scene.width - banner_width - thumbnailWidth - 40.
+      fitHeight <== scene.height - 70.
+
+      preserveRatio = true
     }
 
     def selectSlide(slideNum: Int): Unit = {
@@ -273,53 +286,14 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
       centralImage.image.value = new javafx.scene.image.Image(path)
     }
 
-    val thumbnailHeight = 20.0
-    val thumbnailWidth = 150.0
-    val thumbnailSpacing = 5.0
+    val slideNavigationBox = new HBox {
+      padding = Insets(5, 5, 5, 5)
+      prefWidth <== scene.width - thumbnailWidth - banner_width
 
-    val playPauseBtn: Button = new Button {
-      var isPlaying = true
-      text = "||"
-      minWidth = 35
-      onMouseClicked = ((x: MouseEvent) => {
-        if (isPlaying) this.text() = "|>"
-        else this.text() = "||"
-        isPlaying = !isPlaying
-      })
-    }
-
-    val hbox = new HBox {
       content = List(
-        playPauseBtn,
-        new Slider {
-          maxWidth = 600
-          minWidth = 600
-          translateX = 20
-        },
         new Button {
-          graphic = new ImageView {
-            image = "resource/volume+icon.jpg"
-            fitHeight = 20
-            fitWidth = 20
-          }
-          translateX = 60
-        },
-        new Slider {
-          maxWidth = 100
-          translateX = 70
-        }
-      )
-    }
+          text = "Lectures\nselection"
 
-    content.center = new GridPane {
-      content = List((new VBox {
-        content = List(
-          centralImage,
-          hbox)
-      }, 0, 0),
-        (new Button {
-          text = "<|"
-          translateX = -130
           //translateY <== h / 2.0 - header_height - 10
           onMouseClicked = mouseClickedHandler((_: MouseEvent))
 
@@ -327,10 +301,47 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
             println("<| =====> View lectures")
             controller.executeCommand(viewer, new GoBackCmd)
           }
-        }, 0, 0))
+        },
+        new Button {
+          translateX = thumbnailWidth
+
+          var isPlaying = true
+          text = "||"
+          minWidth = 35
+          onMouseClicked = ((x: MouseEvent) => {
+            if (isPlaying) this.text() = "|>"
+            else this.text() = "||"
+            isPlaying = !isPlaying
+          })
+        },
+        new Slider {
+          prefWidth = 400
+          translateX = thumbnailWidth + 20
+        },
+        new Button {
+          graphic = new ImageView {
+            image = "resource/volume+icon.jpg"
+            fitHeight = 15
+            fitWidth = 15
+          }
+          translateX = thumbnailWidth + 60
+        },
+        new Slider {
+          prefWidth = 100
+          translateX = thumbnailWidth + 70
+        }
+      )
+    }
+
+    content.center = new GridPane {
+      padding = Insets(20, 0, 0, 20)
+
+      content = List(centralImage)
     }
 
     content.left = new VBox {
+      padding = Insets(20, 0, 0, 10)
+
       //      def mouseClickedHandler(x: MouseEvent) = {
       //        println("DEBUG: Lecture selected " + x)
       //        //Controller.executeCommand(new GoForwardCmd)
@@ -374,13 +385,14 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
       spacing = thumbnailSpacing
     }
 
-    /*
-    content.bottom = new Rectangle {
-      width <== w
-      height <== header_height
-      fill = Color.web("#0000FF")
+    content.bottom = new VBox {
+      padding = Insets(5, 5, 5, 5)
+
+      content = List(
+        slideNavigationBox,
+        socialButtons
+      )
     }
-    */
 
     /*
     content.top = new Rectangle {
