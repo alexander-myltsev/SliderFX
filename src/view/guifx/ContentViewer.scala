@@ -7,22 +7,26 @@ import scalafx.scene.paint.Color
 import scalafx.scene.layout.{VBox, HBox, BorderPane}
 import scalafx.scene.image._
 import scalafx.scene.layout.GridPane
+import scalafx.scene.control.{Slider, Button, TextArea}
+import scalafx.scene.Scene
+import scalafx.beans.property.{ReadOnlyObjectProperty, DoubleProperty, IntegerProperty}
+
+import javafx.scene.control.Tooltip
 import javafx.beans.property.{SimpleIntegerProperty, SimpleDoubleProperty}
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.{RowConstraints, ColumnConstraints}
-import scalafx.scene.control.{Slider, Button, TextArea}
-import javafx.scene.control.Tooltip
-import scalafx.scene.control.Labeled._
+import javafx.scene.layout.{RowConstraints}
 
-class Viewer(controller: Controller) extends ViewerAbstract {
-  private val viewer = this // TODO: fix it
+class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
+  viewer =>
+
+  //def getController = controller
 
   def setLecture(lectureNum: Int) = {
-    content = lectureViewer()
+    decorateForLecturing(lectureNum)
   }
 
   def setSlide(slideNum: Int) = {
-    content = slidesViewer()
+    decorateForSliding(slideNum)
   }
 
   def updateNews(news: List[String]) = {
@@ -32,18 +36,13 @@ class Viewer(controller: Controller) extends ViewerAbstract {
   val header_height = new SimpleDoubleProperty(5.0)
   val sider_width = new SimpleDoubleProperty(200.0)
 
-  val w = new SimpleIntegerProperty(1350)
-  val h = new SimpleIntegerProperty(800)
+  decorateForLecturing(1)
 
-  def w_=(v: Int) = w() = v
-
-  def h_=(v: Int) = h() = v
-
-  private val sendMsg = new TextArea {
+  def sendMsg = new TextArea {
     val msg = "Type your question or query here and click \"send\" to receive \na consultation"
     text = msg
     tooltip = new Tooltip(msg)
-    translateY <== h - this.height - 40.0
+    translateY <== scene.height - this.height - 40.0
     maxWidth <== sider_width * 2.0 - 10
 
     onMouseEntered = ((x: MouseEvent) => {
@@ -55,9 +54,27 @@ class Viewer(controller: Controller) extends ViewerAbstract {
     })
   }
 
-  var content: BorderPane = lectureViewer()
+  def decorateForLecturing(lectureNum: Int) = {
+    val w = scene.width
+    val h = scene.height
+    val content = new BorderPane
+    scene.content = List(content)
 
-  private def lectureViewer() = new BorderPane {
+    val lecturesDescriptions = {
+      val cmd = new GetLecturesDescriptionsCmd
+      controller.executeCommand(viewer, cmd)
+      cmd.lecturesDescriptions
+    }
+
+    val centralImage = new ImageView {
+      image = lecturesDescriptions.find(_.id == lectureNum) match {
+        case Some(x) => x.previewPath
+        case None => throw new Exception("Lecture with id == " + lectureNum + " is not found.")
+      }
+      fitWidth <== w - sider_width * 2.0
+      fitHeight <== h - header_height * 2.0 - 30
+    }
+
     def selectLecture(lectureNum: Int) = {
       // TODO: simplify centralImage.image.value
       val path = lecturesDescriptions.find(_.id == lectureNum) match {
@@ -71,13 +88,7 @@ class Viewer(controller: Controller) extends ViewerAbstract {
     val thumbnailWidth = 150.0
     val thumbnailSpacing = 10.0
 
-    val lecturesDescriptions = {
-      val cmd = new GetLecturesDescriptionsCmd
-      controller.executeCommand(viewer, cmd)
-      cmd.lecturesDescriptions
-    }
-
-    bottom = new HBox {
+    content.bottom = new HBox {
       content = for (ls <- lecturesDescriptions) yield {
         new Button {
           minWidth = 150
@@ -96,46 +107,13 @@ class Viewer(controller: Controller) extends ViewerAbstract {
       spacing = thumbnailSpacing
     }
 
-    top = new Rectangle {
+    content.top = new Rectangle {
       width <== w
       height <== header_height
       fill = Color.web("#0000FF")
     }
 
-    val centralImage = new ImageView {
-      image = lecturesDescriptions.find(_.id == 1) match {
-        case Some(x) => x.previewPath
-        case None => throw new Exception("Lecture with id == 1 is not found.")
-      }
-      fitWidth <== w - sider_width * 2.0
-      fitHeight <== h - header_height * 2.0 - 30
-    }
-
-    /*
-    left = new VBox {
-      //      def mouseClickedHandler(x: MouseEvent) = {
-      //        println("DEBUG: Lecture selected " + x)
-      //        //Controller.executeCommand(new GoForwardCmd)
-      //      }
-
-      content = for (ls <- lecturesDescriptions) yield {
-        new ImageView {
-          image = ls.previewPath
-          fitWidth = thumbnailWidth
-          fitHeight = thumbnailHeight
-
-          onMouseClicked = ((x: MouseEvent) => {
-            // TODO: move this multiple instanced handler to one handler
-            println("DEBUG: lecture selected - " + ls.id)
-            Controller.executeCommand(new SelectLectureCmd(ls.id))
-          })
-        }
-      }
-      spacing = thumbnailSpacing
-    }
-    */
-
-    center = new GridPane {
+    content.center = new GridPane {
       content = List((centralImage, 0, 0),
         (new ImageView {
           //text = "|>"
@@ -184,7 +162,6 @@ News #3
         (new HBox {
           content = List(
             new Button {
-              //text = "Twitter"
               graphic = new ImageView {
                 image = "resource/Twitter-icon.png"
                 fitHeight = 30
@@ -194,7 +171,6 @@ News #3
               maxHeight = 30
             },
             new Button {
-              //text = "Facebook"
               graphic = new ImageView {
                 image = "resource/facebook-icon.png"
                 fitHeight = 30
@@ -224,22 +200,18 @@ News #3
     val rc = new RowConstraints()
     rc.setMinHeight(150)
     gp.rowConstraints.addAll(rc)
-    right = gp
+    content.right = gp
+
   }
 
-  private def slidesViewer() = new BorderPane {
-    def selectSlide(slideNum: Int): Unit = {
-      // TODO: simplify centralImage.image.value
-      val path = slidesInfo.find(_.id == slideNum) match {
-        case Some(x) => x.previewPath
-        case None => throw new Exception("Slide with id == " + slideNum + " is not found.")
-      }
-      centralImage.image.value = new javafx.scene.image.Image(path)
-    }
-
-    val thumbnailHeight = 20.0
-    val thumbnailWidth = 150.0
-    val thumbnailSpacing = 5.0
+  def decorateForSliding(slideNum: Int) = {
+    val w = scene.width
+    val h = scene.height
+    val content = new BorderPane
+    scene.content = List(content)
+    //val sider_width = viewer.sider_width
+    //val header_height = viewer.header_height
+    //val controller = viewer.getController
 
     val slidesInfo = {
       val cmd = new GetSlidesCmd(1)
@@ -253,13 +225,26 @@ News #3
       fitHeight <== h - header_height * 2.0 - 20
     }
 
+    def selectSlide(slideNum: Int): Unit = {
+      // TODO: simplify centralImage.image.value
+      val path = slidesInfo.find(_.id == slideNum) match {
+        case Some(x) => x.previewPath
+        case None => throw new Exception("Slide with id == " + slideNum + " is not found.")
+      }
+      centralImage.image.value = new javafx.scene.image.Image(path)
+    }
+
+    val thumbnailHeight = 20.0
+    val thumbnailWidth = 150.0
+    val thumbnailSpacing = 5.0
+
     val playPauseBtn: Button = new Button {
       var isPlaying = true
       text = "||"
       minWidth = 35
       onMouseClicked = ((x: MouseEvent) => {
-        if (isPlaying) playPauseBtn.setText("|>")
-        else playPauseBtn.setText("||")
+        if (isPlaying) this.text() = "|>"
+        else this.text() = "||"
         isPlaying = !isPlaying
       })
     }
@@ -287,7 +272,7 @@ News #3
       )
     }
 
-    center = new GridPane {
+    content.center = new GridPane {
       content = List((new VBox {
         content = List(
           centralImage,
@@ -306,7 +291,7 @@ News #3
         }, 0, 0))
     }
 
-    left = new VBox {
+    content.left = new VBox {
       //      def mouseClickedHandler(x: MouseEvent) = {
       //        println("DEBUG: Lecture selected " + x)
       //        //Controller.executeCommand(new GoForwardCmd)
@@ -321,11 +306,11 @@ News #3
           if (i >= 0 && i < buttons.length) {
             val button = buttons(i)
             button.setMinHeight(thumbnailHeight + 50)
-            button.graphic() = new ImageView {
+            button.graphic = new ImageView {
               image = si.previewPath
               fitWidth = 70
               fitHeight = 70
-            }.delegate
+            }
           }
         }
       }
@@ -346,18 +331,17 @@ News #3
         }
       }
 
-
       content = buttons
       spacing = thumbnailSpacing
     }
 
-    bottom = new Rectangle {
+    content.bottom = new Rectangle {
       width <== w
       height <== header_height
       fill = Color.web("#0000FF")
     }
 
-    top = new Rectangle {
+    content.top = new Rectangle {
       width <== w
       height <== header_height
       fill = Color.web("#0000FF")
@@ -374,6 +358,6 @@ News #3
     val rc = new RowConstraints()
     rc.setMinHeight(150)
     gp.rowConstraints.addAll(rc)
-    right = gp
+    content.right = gp
   }
 }

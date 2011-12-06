@@ -24,54 +24,21 @@ object View extends JFXApp {
     mouseTransparent = true
   }
 
-  // TODO: remove these nulls
-  //var lv: LecturesViewer = null
-
-  //var sv: SlidesViewer = null
-
-  // TODO: simplify stage.scene.value
-  /*
-  def lectureView: Unit = {
-    if (lv == null)
-      lv = new LecturesViewer {
-        w <== scene.width
-        h <== scene.height
-      }
-    stage.scene.value.content = List(fog, lv)
-  }
-  */
-
-  // TODO: simplify stage.scene.value
-  /*
-  def slidesView: Unit = {
-    if (sv == null)
-      sv = new SlidesViewer {
-        w <== scene.width
-        h <== scene.height
-      }
-    stage.scene.value.content = List(sv)
-  }
-  */
-
-  //def selectLecture(lectureNum: Int): Unit = lv.selectLecture(lectureNum)
-
-  //def selectSlide(slideNum: Int): Unit = sv.selectSlide(slideNum)
-
   stage = new Stage {
     width = 1350
     height = 800
     title = "GUI prototype"
-
-    scene = new Scene {
-      val controller = new Controller(new ClientState) // TODO: fix this dependency
-      val viewer = new Viewer(controller) {
-        w <== scene.width
-        h <== scene.height
-      }
-
+    val _scene = new Scene {
       fill = WHITESMOKE
       //fill = Color.color(0, 0, 0, 0.7)
-      content = viewer.content
+      //content = viewer.content
+    }
+    scene = _scene
+
+    val controller = new Controller(new ClientState) // TODO: fix this dependency
+    val viewer = new Viewer(controller, _scene) {
+      //w <== scene.width
+      //h <== scene.height
     }
   }
 
