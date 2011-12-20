@@ -1,9 +1,9 @@
 // set the name of the project
-name := "ScalaFX"
+name := "course-gui"
 
-version := "1.0"
+version := "0.1"
 
-organization := "org.scalafx"
+organization := "com.parallel-compute"
 
 // set the Scala version used for the project
 //scalaVersion := "2.9.0-1"
@@ -198,3 +198,11 @@ credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 // Directly specify credentials for publishing.
 credentials += Credentials("Sonatype Nexus Repository Manager", "nexus.scala-tools.org", "admin", "admin123")
 
+
+
+//libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-proguard-plugin" % (v + "-0.1.1"))
+//seq(ProguardPlugin.proguardSettings: _*)
+//proguardOptions ++= Seq(
+//  keepAllScala,
+//  keepMain("guifx.View")
+//)

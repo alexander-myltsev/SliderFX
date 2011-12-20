@@ -17,6 +17,8 @@ import javafx.beans.property.{SimpleIntegerProperty}
 import javafx.scene.input.MouseEvent
 import javafx.scene.paint.{Stop, CycleMethod, RadialGradient}
 import javafx.geometry.Pos
+import java.net.URI
+import javafx.scene.control.Tooltip
 
 class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   viewer =>
@@ -68,6 +70,8 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
       fitWidth = 32
       onMouseClicked = ((x: MouseEvent) => {
         println("DEBUG: twitter button is clicked")
+        val u = new URI("http://twitter.com")
+        java.awt.Desktop.getDesktop.browse(u)
       })
     }
 
@@ -77,6 +81,8 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
       fitWidth = 32
       onMouseClicked = ((x: MouseEvent) => {
         println("DEBUG: facebook button is clicked")
+        val u = new URI("http://facebook.com")
+        java.awt.Desktop.getDesktop.browse(u)
       })
     }
 
@@ -91,7 +97,6 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   def setLecture(lectureNum: Int) = {
     println("state: " + viewer.state)
     if (viewer.state != ViewerState.SelectingLecture) {
-      println("!!!recreated!!!")
       decorateForLecturing(lectureNum)
       viewer.state = ViewerState.SelectingLecture
     }
@@ -101,7 +106,6 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   def setSlide(slideNum: Int) = {
     //println("state: " + viewer.state)
     if (viewer.state != ViewerState.SelectingSlides) {
-      println("!!!recreated!!!")
       decorateForSliding(slideNum)
       viewer.state = ViewerState.SelectingSlides
     }
@@ -116,7 +120,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
     alignment = Pos.TOP_RIGHT
 
     val questionTextArea = new TextArea {
-      padding = Insets(20, 0, 0, 0)
+      padding = Insets(20, 20, 20, 20)
 
       prefHeight <== scene.height * 0.3
       val msg = "Type your question or query here and click \"send\" to receive a consultation"
@@ -142,6 +146,8 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
         image = "resource/TESLA_20Series-WBA_200x100_pic.jpg"
         onMouseClicked = ((x: MouseEvent) => {
           println("DEBUG: TESLA_20Series is clicked")
+          val u = new URI("http://www.nvidia.com/object/tesla_computing_solutions.html")
+          java.awt.Desktop.getDesktop.browse(u)
         })
         //fitWidth = 200
       },
@@ -159,7 +165,10 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
         translateY = -10
         onMouseClicked = ((x: MouseEvent) => {
           println("DEBUG: Question is sent: '" + questionTextArea.text() + "'")
+          // TODO: make button.text to "Message sent", and then to "Send another"
         })
+
+        //tooltip = new Tooltip("Message is sent")
       })
   }
 
@@ -216,7 +225,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
             centralImage,
             new ImageView {
               //translateX <== centralImage.image().widthProperty / 2.
-              translateX = 20
+              translateX = 300
               translateY = -20
               opacity = 0.2
 
@@ -267,7 +276,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
 
   def decorateForSliding(slideNum: Int) = {
     val thumbnailHeight = 20.0
-    val thumbnailWidth = 150.0
+    val thumbnailWidth = 100.0
     val thumbnailSpacing = 5.0
 
     val content = new BorderPane {
@@ -285,22 +294,11 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
     val centralImage = new ImageView {
       image = slidesInfo.head.previewPath
 
-      fitWidth <== scene.width - banner_width - thumbnailWidth - 40.
+      fitWidth <== scene.width - banner_width - thumbnailWidth - 60.
       fitHeight <== scene.height - 70.
 
       preserveRatio = true
     }
-
-    /*
-    def selectSlide(slideNum: Int): Unit = {
-      // TODO: simplify centralImage.image.value
-      val path = slidesInfo.find(_.id == slideNum) match {
-        case Some(x) => x.previewPath
-        case None => throw new Exception("Slide with id == " + slideNum + " is not found.")
-      }
-      centralImage.image.value = new javafx.scene.image.Image(path)
-    }
-    */
 
     slideNumber onChange {
       (prop, oldVal, newVal) => {
@@ -379,17 +377,18 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
         val pointer = "--->"
         buttons foreach ((b: Button) => {
           b.minHeight() = thumbnailHeight
+          b.minWidth() = thumbnailWidth
           b.graphic() = null // TODO: All except two are actually non-null
 
           val txt = b.text()
           if (txt.endsWith(pointer)) b.text() = txt.substring(0, txt.length - pointer.length)
         })
-        buttons(si.id - 1).text() += pointer
+
         //for (i <- si.id - 3 to si.id + 1) {
         for (i <- si.id - 2 to si.id) {
           if (i >= 0 && i < buttons.length && i + 1 != si.id) {
             val button = buttons(i)
-            button.setMinHeight(thumbnailHeight + 50)
+            button.minHeight() = thumbnailHeight + 50
             button.graphic = new ImageView {
               image = slidesInfo(i).previewPath // TODO: fix it
               fitWidth = 70
@@ -397,6 +396,9 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
             }
           }
         }
+
+        buttons(si.id - 1).text() += pointer
+        buttons(si.id - 1).minWidth() = thumbnailWidth + 10
       }
 
       val buttons: List[Button] = for (si <- slidesInfo) yield {
