@@ -7,6 +7,7 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
@@ -54,6 +55,8 @@ class JImagePanel extends JPanel {
             image = ImageIO.read(new File(path));
             if (isPlayable)
                 image = JImagePanel.overlayImages(image, ImageIO.read(new File("resource/Silver-Play-Button.jpg")));
+            Border blackline = BorderFactory.createLineBorder(Color.black);
+            setBorder(blackline);
         } catch (IOException ex) {
             // handle exception...
         }
@@ -72,17 +75,20 @@ class JImagePanel extends JPanel {
 
     @Override
     public void paintComponent(Graphics g) {
-        double imageRatio = (double) image.getWidth() / (double) image.getHeight();
-        double panelRatio = (double) getWidth() / (double) getHeight();
-        int w, h;
-        if (panelRatio > imageRatio) {
-            w = Math.min(image.getWidth(), getWidth());
-            h = (int) (w / panelRatio);
-        } else {
-            h = Math.min(image.getHeight(), getHeight());
-            w = (int) (h * panelRatio);
-        }
-        g.drawImage(image.getScaledInstance(w, h, Image.SCALE_SMOOTH), 0, 0, null);
+        /*
+        int w = image.getWidth() / 2;
+        int h = image.getHeight() / 2;
+        int xStart = (getWidth() - w) / 2;
+        int yStart = (getHeight() - h) / 2;
+        g.drawImage(image.getScaledInstance(w, h, Image.SCALE_SMOOTH), xStart, yStart, null);
+        */
+
+        float fitToFrameScale = Math.min((float) getWidth() / (float) image.getWidth(), (float) getHeight() / (float) image.getHeight());
+        int widthScaled = (int) (image.getWidth() * fitToFrameScale);
+        int heightScaled = (int) (image.getHeight() * fitToFrameScale);
+        int xStart = (getWidth() - widthScaled) / 2;
+        int yStart = (getHeight() - heightScaled) / 2;
+        g.drawImage(image.getScaledInstance(widthScaled, heightScaled, Image.SCALE_SMOOTH), xStart, yStart, null);
     }
 }
 
@@ -114,7 +120,7 @@ class GoogleTest {
                 new javax.mail.Authenticator() {
 
                     protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication("alexander.myltsev@gmail.com", "28*Bc/28=Bc");
+                        return new PasswordAuthentication("alexander.myltsev@gmail.com", "My_password");
                     }
                 });
 
@@ -490,8 +496,8 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
                 int startY = (dimension.height - mainFrame.currentHeight) / 2;
 
                 //JFrame frame = new JFrame("CourseGUI");
-                //mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
-                mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
+                mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
+                //mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
                 mainFrame.frame.pack();
                 mainFrame.frame.setSize(mainFrame.currentWidth, mainFrame.currentHeight);
                 mainFrame.frame.setLocation(startX, startY);
