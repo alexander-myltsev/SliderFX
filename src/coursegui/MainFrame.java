@@ -29,13 +29,12 @@ class JImagePanel extends JPanel {
 
     private static BufferedImage overlayImages(BufferedImage bgImage, BufferedImage fgImage) {
 
-        if (fgImage.getHeight() > bgImage.getHeight()
-                || fgImage.getWidth() > fgImage.getWidth()) {
+        if (fgImage.getHeight() > bgImage.getHeight() || fgImage.getWidth() > fgImage.getWidth()) {
             JOptionPane.showMessageDialog(null,
                     "Foreground Image Is Bigger In One or Both Dimensions"
                             + "\nCannot proceed with overlay."
                             + "\n\n Please use smaller Image for foreground");
-            return null;
+            return bgImage;
         }
 
         Graphics2D g = bgImage.createGraphics();
@@ -92,7 +91,7 @@ class JImagePanel extends JPanel {
     }
 }
 
-class GoogleTest {
+class GoogleMailer {
 
     private static final String SMTP_HOST_NAME = "smtp.gmail.com";
     private static final String SMTP_PORT = "465";
@@ -143,7 +142,7 @@ class GoogleTest {
     }
 }
 
-public class MainFrame implements ActionListener, MouseListener, HyperlinkListener {
+public class MainFrame {
     private static final boolean OPAQUE = false;
     private int currentHeight = 0;
     private int currentWidth = 0;
@@ -177,21 +176,12 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
         Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
 
         try {
-            new GoogleTest().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress);
+            new GoogleMailer().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress);
             System.out.println("Sucessfully Sent mail to All Users");
         } catch (MessagingException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
-
-    /*
-    void commonMethod() {
-                if (ta.getText().equals(text)) ta.setText("");
-                else if (ta.getText().equals("")) ta.setText(text);
-                textOfQuestion = ta.getText();
-                System.out.println(textOfQuestion);
-            }
-            */
 
     private JScrollPane createTextAreaScroll(int rows, int cols, boolean hasVerScroll) {
         final String text = "\n\n\nType your question or query here and click \"send\" to receive a consultation";
@@ -217,19 +207,7 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
             }
         });
 
-        ta.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
+        ta.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 if (ta.getText().equals(text)) {
@@ -254,15 +232,6 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
         return scroll;
     }
 
-    /*
-    private String news = "January 16-18, 2012. A two day CUDA course at the Technical University of Munich. Germany.\n" +
-            "\n" +
-            "GPU Computing and CUDA. Supercomputing winter school at MSU for \"T-Platforms'\n" +
-            "\n" +
-            "APC and NVIDIA hold a \"GPU computing with CUDA\" seminar at the Informatics and Radioelectronics University, Minsk, Belarus\n" +
-            "\n" +
-            "October 17-19, 2011 A three- day CUDA course at the Supercomputing center of Poznan, Poland.";
-            */
     private String news = "\t\t<h3>February 1, 2012 &nbsp;&nbsp;&nbsp;&nbsp; </h3>\n" +
             "\t\t<a href=\"http://cuda-course.eventbrite.com/\">5-8 february On-site training and Consultancy and a 4 day advanced CUDA course at  Irish Supercomputing Center ICHEC, Dublin</a>\n" +
             "\n" +
@@ -288,20 +257,54 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
                 {"resource/twitter+icon.jpg", "twitter-clicked"}
         };
         ArrayList<JButton> buttons = new ArrayList<JButton>();
+        ActionListener socialButtonsEventListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //System.out.println(e.toString());
+                try {
+                    URI u;
+                    if ("rss-clicked".equals(e.getActionCommand()))
+                        u = new URI("http://parallel-compute.com/news/");
+                    else if ("facebook-clicked".equals(e.getActionCommand())) u = new URI("http://facebook.com");
+                    else if ("linkedin-clicked".equals(e.getActionCommand())) u = new URI("http://linkedin.com");
+                    else if ("twitter-clicked".equals(e.getActionCommand())) u = new URI("http://twitter.com");
+                    else if ("youtube-clicked".equals(e.getActionCommand())) u = new URI("http://youtube.com");
+                    else u = new URI("http://parallel-compute.com");
+                    Desktop.getDesktop().browse(u);
+                } catch (URISyntaxException e1) {
+                    e1.printStackTrace(); // TODO: Process the error correctly.
+                } catch (IOException e1) {
+                    e1.printStackTrace(); // TODO: Process the error correctly.
+                }
+            }
+        };
         for (int i = 0; i < pathsToIcons.length; i++) {
             JButton button = new JButton("", new ImageIcon(pathsToIcons[i][0]));
-            button.addActionListener(new SocialButtonsActionListener());
+            button.addActionListener(socialButtonsEventListener);
             button.setActionCommand(pathsToIcons[i][1]);
             buttons.add(button);
         }
         return buttons;
     }
 
+    class LectureButtonListener implements ActionListener {
+        private JImagePanel lectureContentViewer;
+
+        LectureButtonListener(JImagePanel lectureContentViewer) {
+            this.lectureContentViewer = lectureContentViewer;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            lectureNumber = Integer.parseInt(e.getActionCommand());
+            String path = "resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG";
+            lectureContentViewer.updateImage(path, true);
+        }
+    }
+
     private JPanel createLectureSelectorPanel() {
         final JPanel panel = new JPanel(new MigLayout(
                 "insets 10",
-                //"[grow,fill][grow,fill][grow,fill][grow,fill]10[]",
-                //"[][c,grow 33,fill][c,grow 67,fill]1[][]"), true);
                 "[grow,fill]10[]",
                 "[grow 90,fill][grow 10,fill][]"), true
         ) {
@@ -312,29 +315,32 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
         };
 
 
-        final JImagePanel lectureContentViewer = new JImagePanel("resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG", true);
+        JImagePanel lectureContentViewer = new JImagePanel("resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG", true);
         lectureContentViewer.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        lectureContentViewer.addMouseListener(this);
+        lectureContentViewer.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                System.out.println("Mouse clicked");
+                JPanel slidesSelectorPanel = createSlidesSelectorPanel();
+                frame.setVisible(false);
+                frame.setContentPane(slidesSelectorPanel);
+                frame.pack();
+                frame.setSize(currentWidth, currentHeight);
+                frame.setVisible(true);
+            }
+        });
         panel.add(lectureContentViewer, "cell 0 0");
 
         panel.add(createBanner(), "w 200!, h 100!, flowy, cell 1 0");
-        //panel.add(createTextAreaScroll(news, 4, 30, true), "w 200!, h 200!,flowy, cell 1 0");
         panel.add(createNewsPanel(news, true), "w 200!, h 200!,flowy, cell 1 0");
         panel.add(createTextAreaScroll(4, 30, true), "w 200!, flowy, grow, cell 1 0");
         panel.add(createSendButton(), "gap push, cell 1 0");
 
+        LectureButtonListener lectureButtonActionListener = new LectureButtonListener(lectureContentViewer);
         for (int i = 1; i <= 8; i++) {
-            //JToggleButton lectureButton = new JToggleButton("Lecture " + i);
             JButton lectureButton = new JButton("Lecture " + i);
-            final int lectNum = i;
-            lectureButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    lectureNumber = lectNum;
-                    String path = "resource/Lectures/Lecture" + lectNum + "/Slide1.PNG";
-                    lectureContentViewer.updateImage(path, true);
-                }
-            });
+            lectureButton.setActionCommand("" + i);
+            lectureButton.addActionListener(lectureButtonActionListener);
             panel.add(lectureButton, "cell 0 1,grow,flowx");
         }
 
@@ -362,7 +368,22 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
         ep.setContentType("text/html");
         ep.setText(news);
         ep.setEditable(false);
-        ep.addHyperlinkListener(this);
+        ep.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                //To change body of implemented methods use File | Settings | File Templates.
+                //System.out.println(e);
+
+                try {
+                    if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+                        Desktop.getDesktop().browse(e.getURL().toURI());
+                } catch (IOException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (URISyntaxException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+        });
         ep.setCaretPosition(0);
 
         JScrollPane scroll = new JScrollPane(
@@ -402,7 +423,6 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
         panel.add(slideSelectorPanel, "grow");
 
         panel.add(createBanner(), "w 200!, h 100!, cell 2 0,flowy");
-        //panel.add(createTextAreaScroll(news, 4, 30, true), "w 200!, grow, cell 2 0,flowy");
         panel.add(createNewsPanel(news, true), "w 200!, h 200!, grow, cell 2 0,flowy");
         panel.add(createTextAreaScroll(4, 30, true), "w 200!, grow, cell 2 0,flowy");
 
@@ -425,7 +445,18 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
         panel.add(createSendButton(), "cell 2 1,gapx push,wrap");
 
         JButton backToLectureSelectionButton = new JButton("<html>Lecture<br/>selection</html>");
-        backToLectureSelectionButton.addActionListener(this);
+        backToLectureSelectionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Back to lecture selection is clicked");
+                JPanel lectureSelectorPanel = createLectureSelectorPanel();
+                frame.setVisible(false);
+                frame.setContentPane(lectureSelectorPanel);
+                frame.pack();
+                frame.setSize(currentWidth, currentHeight);
+                frame.setVisible(true);
+            }
+        });
         panel.add(backToLectureSelectionButton, "");
 
         ArrayList<JButton> socialButtons = getSocialButtons();
@@ -442,14 +473,6 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
         banner.setCursor(new Cursor(Cursor.HAND_CURSOR));
         banner.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
             public void mouseReleased(MouseEvent e) {
                 try {
                     Desktop.getDesktop().browse(new URI("http://www.nvidia.com/object/workstation-solutions-tesla.html"));
@@ -458,14 +481,6 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
                 } catch (URISyntaxException e1) {
                     e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
             }
         });
         return banner;
@@ -544,83 +559,5 @@ public class MainFrame implements ActionListener, MouseListener, HyperlinkListen
         mainPanel.add(registrationButton);
 
         return mainPanel;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        System.out.println("Back to lecture selection is clicked");
-        JPanel lectureSelectorPanel = createLectureSelectorPanel();
-        frame.setVisible(false);
-        frame.setContentPane(lectureSelectorPanel);
-        frame.pack();
-        frame.setSize(currentWidth, currentHeight);
-        frame.setVisible(true);
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        System.out.println("Mouse clicked");
-        JPanel slidesSelectorPanel = createSlidesSelectorPanel();
-        frame.setVisible(false);
-        frame.setContentPane(slidesSelectorPanel);
-        frame.pack();
-        frame.setSize(currentWidth, currentHeight);
-        frame.setVisible(true);
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void hyperlinkUpdate(HyperlinkEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
-        //System.out.println(e);
-
-        try {
-            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
-                Desktop.getDesktop().browse(e.getURL().toURI());
-        } catch (IOException e1) {
-            e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-    }
-}
-
-class SocialButtonsActionListener implements ActionListener {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        //System.out.println(e.toString());
-        try {
-            URI u;
-            if ("rss-clicked".equals(e.getActionCommand())) u = new URI("http://parallel-compute.com/news/");
-            else if ("facebook-clicked".equals(e.getActionCommand())) u = new URI("http://facebook.com");
-            else if ("linkedin-clicked".equals(e.getActionCommand())) u = new URI("http://linkedin.com");
-            else if ("twitter-clicked".equals(e.getActionCommand())) u = new URI("http://twitter.com");
-            else if ("youtube-clicked".equals(e.getActionCommand())) u = new URI("http://youtube.com");
-            else u = new URI("http://parallel-compute.com");
-            java.awt.Desktop.getDesktop().browse(u);
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace(); // TODO: Process the error correctly.
-        } catch (IOException e1) {
-            e1.printStackTrace(); // TODO: Process the error correctly.
-        }
     }
 }
