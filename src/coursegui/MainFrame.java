@@ -232,7 +232,7 @@ public class MainFrame {
         return scroll;
     }
 
-    private String news = "\t\t<h3>February 1, 2012 &nbsp;&nbsp;&nbsp;&nbsp; </h3>\n" +
+    private String news = "<h2>Latest News</h2>\t\t<h3>February 1, 2012 &nbsp;&nbsp;&nbsp;&nbsp; </h3>\n" +
             "\t\t<a href=\"http://cuda-course.eventbrite.com/\">5-8 february On-site training and Consultancy and a 4 day advanced CUDA course at  Irish Supercomputing Center ICHEC, Dublin</a>\n" +
             "\n" +
             "\t\t<br/><br/>\n" +
@@ -436,13 +436,13 @@ public class MainFrame {
                     playPauseButton.setText("||");
             }
         });
-        panel.add(playPauseButton, "cell 1 1,w 50!");
-        panel.add(new JSlider(0, 100, 0), "cell 1 1,growx 90");
+        panel.add(playPauseButton, "cell 1 1,w 50!,h 35!");
+        panel.add(new JSlider(0, 100, 0), "cell 1 1,growx 90,h 35!");
         //panel.add(new JButton("Mute"), "cell 1 1,w 65!");
-        panel.add(new JLabel(new ImageIcon("resource/volume+icon.jpg")), "cell 1 1,w 30!,h 30!");
+        panel.add(new JLabel(new ImageIcon("resource/volume+icon.jpg")), "cell 1 1,w 30!,h 35!");
         JSlider jSlider = new JSlider(0, 100, 100);
-        panel.add(jSlider, "cell 1 1,w 100!");
-        panel.add(createSendButton(), "cell 2 1,gapx push,wrap");
+        panel.add(jSlider, "cell 1 1,w 100!,h 35!");
+        panel.add(createSendButton(), "cell 2 0,gapx push");
 
         JButton backToLectureSelectionButton = new JButton("<html>Lecture<br/>selection</html>");
         backToLectureSelectionButton.addActionListener(new ActionListener() {
@@ -457,12 +457,11 @@ public class MainFrame {
                 frame.setVisible(true);
             }
         });
-        panel.add(backToLectureSelectionButton, "w 70!");
+        panel.add(backToLectureSelectionButton, "w 70!,cell 0 1");
 
         ArrayList<JButton> socialButtons = getSocialButtons();
-        panel.add(socialButtons.get(0), "gap push,w 35!,cell 2 2");
-        for (int i = 1; i < socialButtons.size(); i++) {
-            panel.add(socialButtons.get(i), "w 35!,cell 2 2");
+        for (int i = 0; i < socialButtons.size(); i++) {
+            panel.add(socialButtons.get(i), "gapx push,gapy push,w 35!,h 35!,cell 2 1");
         }
 
         return panel;
