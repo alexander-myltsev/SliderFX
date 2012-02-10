@@ -306,7 +306,7 @@ public class MainFrame {
         final JPanel panel = new JPanel(new MigLayout(
                 "insets 10",
                 "[grow,fill]10[]",
-                "[grow 90,fill][grow 10,fill][]"), true
+                "[grow,fill][][]"), true
         ) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -337,11 +337,11 @@ public class MainFrame {
         panel.add(createSendButton(), "gap push, cell 1 0");
 
         LectureButtonListener lectureButtonActionListener = new LectureButtonListener(lectureContentViewer);
-        for (int i = 1; i <= 8; i++) {
+        for (int i = 1; i <= 4; i++) {
             JButton lectureButton = new JButton("Lecture " + i);
             lectureButton.setActionCommand("" + i);
             lectureButton.addActionListener(lectureButtonActionListener);
-            panel.add(lectureButton, "cell 0 1,grow,flowx");
+            panel.add(lectureButton, "cell 0 1,h 35!,flowx");
         }
 
         ArrayList<JButton> socialButtons = getSocialButtons();
@@ -417,7 +417,7 @@ public class MainFrame {
                     slideSelectorPanel.updateImage(path, false);
                 }
             });
-            panel.add(slideButton, "cell 0 0,flowy,sg g1");
+            panel.add(slideButton, "cell 0 0,flowy,sg g1,w 70!");
         }
 
         panel.add(slideSelectorPanel, "grow");
@@ -457,7 +457,7 @@ public class MainFrame {
                 frame.setVisible(true);
             }
         });
-        panel.add(backToLectureSelectionButton, "");
+        panel.add(backToLectureSelectionButton, "w 70!");
 
         ArrayList<JButton> socialButtons = getSocialButtons();
         panel.add(socialButtons.get(0), "gap push,w 35!,cell 2 2");
