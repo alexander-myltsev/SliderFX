@@ -250,11 +250,11 @@ public class MainFrame {
 
     private ArrayList<JButton> getSocialButtons() {
         String[][] pathsToIcons = {
-                {"resource/rss-icon.jpg", "rss-clicked"},
-                {"resource/youtube-icon.jpg", "youtube-clicked"},
-                {"resource/facebook-icon.jpg", "facebook-clicked"},
-                {"resource/linkedinicon.jpg", "linkedin-clicked"},
-                {"resource/twitter+icon.jpg", "twitter-clicked"}
+                {"resource/rss.png", "rss-clicked"},
+                {"resource/youtube.png", "youtube-clicked"},
+                {"resource/facebook.png", "facebook-clicked"},
+                {"resource/linkedin.png", "linkedin-clicked"},
+                {"resource/twitter.png", "twitter-clicked"}
         };
         ArrayList<JButton> buttons = new ArrayList<JButton>();
         ActionListener socialButtonsEventListener = new ActionListener() {
