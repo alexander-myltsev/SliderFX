@@ -305,8 +305,8 @@ public class MainFrame {
     private JPanel createLectureSelectorPanel() {
         final JPanel panel = new JPanel(new MigLayout(
                 "insets 10",
-                "[grow,fill]10[]",
-                "[grow,fill][][]"), true
+                "[grow,fill][]",
+                "[grow,fill][]"), true
         ) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -333,8 +333,9 @@ public class MainFrame {
 
         panel.add(createBanner(), "w 200!, h 100!, flowy, cell 1 0");
         panel.add(createNewsPanel(news, true), "w 200!, h 200!,flowy, cell 1 0");
+        panel.add(new JLabel("Ask a question"), "gapx push, cell 1 0");
         panel.add(createTextAreaScroll(4, 30, true), "w 200!, flowy, grow, cell 1 0");
-        panel.add(createSendButton(), "gap push, cell 1 0");
+        panel.add(createSendButton(), "gapx push, gapy 0px, cell 1 0"); // pos visual.x2-pref visual.y2-pref-35
 
         LectureButtonListener lectureButtonActionListener = new LectureButtonListener(lectureContentViewer);
         for (int i = 1; i <= 4; i++) {
@@ -424,7 +425,9 @@ public class MainFrame {
 
         panel.add(createBanner(), "w 200!, h 100!, cell 2 0,flowy");
         panel.add(createNewsPanel(news, true), "w 200!, h 200!, grow, cell 2 0,flowy");
+        panel.add(new JLabel("Ask a question"), "gapx push, cell 2 0");
         panel.add(createTextAreaScroll(4, 30, true), "w 200!, grow, cell 2 0,flowy");
+        panel.add(createSendButton(), "cell 2 0, gapx push, gapy 0px");
 
         final JButton playPauseButton = new JButton("||");
         playPauseButton.addActionListener(new ActionListener() {
@@ -442,7 +445,6 @@ public class MainFrame {
         panel.add(new JLabel(new ImageIcon("resource/volume+icon.jpg")), "cell 1 1,w 30!,h 35!");
         JSlider jSlider = new JSlider(0, 100, 100);
         panel.add(jSlider, "cell 1 1,w 100!,h 35!");
-        panel.add(createSendButton(), "cell 2 0,gapx push");
 
         JButton backToLectureSelectionButton = new JButton("<html>Lecture<br/>selection</html>");
         backToLectureSelectionButton.addActionListener(new ActionListener() {
@@ -457,7 +459,7 @@ public class MainFrame {
                 frame.setVisible(true);
             }
         });
-        panel.add(backToLectureSelectionButton, "w 70!,cell 0 1");
+        panel.add(backToLectureSelectionButton, "w 70!,h 35!,cell 0 1");
 
         ArrayList<JButton> socialButtons = getSocialButtons();
         for (int i = 0; i < socialButtons.size(); i++) {
