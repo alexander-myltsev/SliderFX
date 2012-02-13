@@ -143,6 +143,8 @@ class GoogleMailer {
 }
 
 public class MainFrame {
+
+
     private static final boolean OPAQUE = false;
     private int currentHeight = 0;
     private int currentWidth = 0;
@@ -418,7 +420,7 @@ public class MainFrame {
                     slideSelectorPanel.updateImage(path, false);
                 }
             });
-            panel.add(slideButton, "cell 0 0,flowy,sg g1,w 70!");
+            panel.add(slideButton, "cell 0 0,flowy,sg g1,w 80!");
         }
 
         panel.add(slideSelectorPanel, "grow");
@@ -487,9 +489,23 @@ public class MainFrame {
         return banner;
     }
 
+    private static void setUIFont(javax.swing.plaf.FontUIResource f) {
+        java.util.Enumeration keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get(key);
+            if (value instanceof javax.swing.plaf.FontUIResource) {
+                UIManager.put(key, f);
+            }
+        }
+    }
+
     JFrame frame = new JFrame("CourseGUI");
 
     public static void main(final String[] args) {
+        Font globalFont = new Font("Tahoma", Font.PLAIN, 12);
+        setUIFont(new javax.swing.plaf.FontUIResource(globalFont));
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
