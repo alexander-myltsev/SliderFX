@@ -247,7 +247,7 @@ public class MainFrame {
 
         GetCurrentLectureCmd getCurrentLectureCmd = new GetCurrentLectureCmd();
         controller.executeCommand(getCurrentLectureCmd);
-        JImagePanel lectureContentViewer = new JImagePanel(getCurrentLectureCmd.content().content(), true);
+        JImagePanel lectureContentViewer = new JImagePanel(getCurrentLectureCmd.content().content());
         lectureContentViewer.setCursor(new Cursor(Cursor.HAND_CURSOR));
         lectureContentViewer.addMouseListener(new MouseAdapter() {
             @Override
@@ -340,7 +340,7 @@ public class MainFrame {
 
         GetCurrentSlideCmd getCurrentSlideCmd = new GetCurrentSlideCmd();
         controller.executeCommand(getCurrentSlideCmd);
-        final JImagePanel slideSelectorPanel = new JImagePanel(getCurrentSlideCmd.content().content(), false);
+        final JImagePanel slideSelectorPanel = new JImagePanel(getCurrentSlideCmd.content().content());
 
         for (int i = 1; i < 10; i++) {
             JButton slideButton = new JButton("Slide " + i);

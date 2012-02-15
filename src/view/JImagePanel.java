@@ -1,60 +1,23 @@
 package view;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 class JImagePanel extends JPanel {
 
     private BufferedImage image;
 
-    private static BufferedImage overlayImages(BufferedImage bgImage, BufferedImage fgImage) {
-
-        if (fgImage.getHeight() > bgImage.getHeight() || fgImage.getWidth() > fgImage.getWidth()) {
-            JOptionPane.showMessageDialog(null,
-                    "Foreground Image Is Bigger In One or Both Dimensions"
-                            + "\nCannot proceed with overlay."
-                            + "\n\n Please use smaller Image for foreground");
-            return bgImage;
-        }
-
-        Graphics2D g = bgImage.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.drawImage(bgImage, 0, 0, null);
-        float alpha = 0.2f;
-        AlphaComposite composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
-        g.setComposite(composite);
-        g.drawImage(fgImage, 350, 200, null);
-
-        g.dispose();
-        return bgImage;
-    }
-
-    public JImagePanel(BufferedImage image, boolean isPlayable) {
-        try {
-            this.image = image;
-            if (isPlayable)
-                image = JImagePanel.overlayImages(image, ImageIO.read(new File("resource/Silver-Play-Button.jpg")));
-            Border blackline = BorderFactory.createLineBorder(Color.black);
-            setBorder(blackline);
-        } catch (IOException ex) {
-            // handle exception...
-        }
+    public JImagePanel(BufferedImage image) {
+        this.image = image;
+        Border blackline = BorderFactory.createLineBorder(Color.black);
+        setBorder(blackline);
     }
 
     public void updateImage(BufferedImage image, boolean isPlayable) {
-        try {
-            this.image = image;
-            if (isPlayable)
-                this.image = JImagePanel.overlayImages(image, ImageIO.read(new File("resource/Silver-Play-Button.jpg")));
-            repaint();
-        } catch (IOException ex) {
-            // handle exception...
-        }
+        this.image = image;
+        repaint();
     }
 
     @Override
