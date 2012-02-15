@@ -1,4 +1,4 @@
-package coursegui;
+package view;
 
 import net.miginfocom.swing.MigLayout;
 
