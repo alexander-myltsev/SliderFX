@@ -1,9 +1,6 @@
 package view;
 
-import controller.Controller;
-import controller.GetCurrentLectureCmd;
-import controller.LectureDescription;
-import controller.SelectLectureCmd;
+import controller.*;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -232,8 +229,7 @@ public class MainFrame {
             SelectLectureCmd command = new SelectLectureCmd(lectNum);
             controller.executeCommand(command);
             LectureDescription lectureDescription = command.lectureDescription();
-
-            String path = "resource/Lectures/Lecture" + lectNum + "/Slide1.PNG"; // TODO: finish it
+            lectureContentViewer.updateImage(lectureDescription.content(), true);
         }
     }
 
@@ -251,7 +247,7 @@ public class MainFrame {
 
         GetCurrentLectureCmd getCurrentLectureCmd = new GetCurrentLectureCmd();
         controller.executeCommand(getCurrentLectureCmd);
-        JImagePanel lectureContentViewer = new JImagePanel("resource/Lectures/Lecture" + getCurrentLectureCmd.lectureNumber() + "/Slide1.PNG", true);
+        JImagePanel lectureContentViewer = new JImagePanel(getCurrentLectureCmd.content().content(), true);
         lectureContentViewer.setCursor(new Cursor(Cursor.HAND_CURSOR));
         lectureContentViewer.addMouseListener(new MouseAdapter() {
             @Override
@@ -342,9 +338,9 @@ public class MainFrame {
             }
         };
 
-        GetCurrentLectureCmd getCurrentLectureCmd = new GetCurrentLectureCmd();
-        controller.executeCommand(getCurrentLectureCmd);
-        final JImagePanel slideSelectorPanel = new JImagePanel("resource/Lectures/Lecture" + getCurrentLectureCmd.lectureNumber() + "/Slide1.PNG", false);
+        GetCurrentSlideCmd getCurrentSlideCmd = new GetCurrentSlideCmd();
+        controller.executeCommand(getCurrentSlideCmd);
+        final JImagePanel slideSelectorPanel = new JImagePanel(getCurrentSlideCmd.content().content(), false);
 
         for (int i = 1; i < 10; i++) {
             JButton slideButton = new JButton("Slide " + i);
@@ -354,8 +350,10 @@ public class MainFrame {
                 public void actionPerformed(ActionEvent e) {
                     // TODO: FIX IT
                     //slideNumber = slideNum;
-                    String path = "resource/Lectures/Lecture" + 1 + "/Slide" + 1 + ".PNG";
-                    slideSelectorPanel.updateImage(path, false);
+                    //String path = "resource/Lectures/Lecture" + 1 + "/Slide" + 1 + ".PNG";
+                    GetCurrentSlideCmd getCurrentSlideCmd1 = new GetCurrentSlideCmd();
+                    controller.executeCommand(getCurrentSlideCmd1);
+                    slideSelectorPanel.updateImage(getCurrentSlideCmd1.content().content(), false);
                 }
             });
             panel.add(slideButton, "cell 0 0,flowy,sg g1,w 80!");

@@ -1,5 +1,7 @@
 package controller
 
-case class LectureDescription(id: Int, information: String, previewPath: String)
+import java.awt.image.BufferedImage
 
-case class SlideInfo(id: Int, title: String, previewPath: String)
+case class LectureDescription(id: Int, information: String, content: BufferedImage)
+
+case class SlideInfo(id: Int, title: String, content: BufferedImage)

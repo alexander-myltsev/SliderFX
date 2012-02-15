@@ -34,9 +34,9 @@ class JImagePanel extends JPanel {
         return bgImage;
     }
 
-    public JImagePanel(String path, boolean isPlayable) {
+    public JImagePanel(BufferedImage image, boolean isPlayable) {
         try {
-            image = ImageIO.read(new File(path));
+            this.image = image;
             if (isPlayable)
                 image = JImagePanel.overlayImages(image, ImageIO.read(new File("resource/Silver-Play-Button.jpg")));
             Border blackline = BorderFactory.createLineBorder(Color.black);
@@ -46,11 +46,11 @@ class JImagePanel extends JPanel {
         }
     }
 
-    public void updateImage(String path, boolean isPlayable) {
+    public void updateImage(BufferedImage image, boolean isPlayable) {
         try {
-            image = ImageIO.read(new File(path));
+            this.image = image;
             if (isPlayable)
-                image = JImagePanel.overlayImages(image, ImageIO.read(new File("resource/Silver-Play-Button.jpg")));
+                this.image = JImagePanel.overlayImages(image, ImageIO.read(new File("resource/Silver-Play-Button.jpg")));
             repaint();
         } catch (IOException ex) {
             // handle exception...

@@ -3,6 +3,7 @@ package controller
 import model._
 import model.authorization._
 import model.lectures._
+import java.awt.image.BufferedImage
 
 abstract class Command
 
@@ -18,6 +19,13 @@ case class SelectLectureCmd(lectureNumber: Int) extends Command {
 
 case class GetCurrentLectureCmd() extends Command {
   var lectureNumber: Int = -1
+  var content: LectureDescription = null
+}
+
+case class GetCurrentSlideCmd() extends Command {
+  var lectureNumber: Int = -1
+  var slideNumber: Int = -1
+  var content: SlideInfo = null
 }
 
 case class SelectSlideCmd(slideNumber: Int) extends Command
@@ -45,9 +53,9 @@ class ControllerImplementation(model: Model) extends Controller {
         cmd.isPassed = (status == authorization.Status.Success)
 
       case (cmd: SelectLectureCmd) =>
-        //clientState.lectureNumber = cmd.lectureNumber
-        //viewer.setLecture(clientState.lectureNumber)
-        println("lecture selected")
+        val lectureNumber = cmd.lectureNumber
+        model.lectureNumber = lectureNumber
+        cmd.lectureDescription = ContentManager.getLectureDescription(lectureNumber)
       case (cmd: GetLecturesDescriptionsCmd) => cmd.lecturesDescriptions = ContentManager.getLecturesDescriptions
 
       case (cmd: SelectSlideCmd) =>
@@ -56,8 +64,14 @@ class ControllerImplementation(model: Model) extends Controller {
         println("slide selected")
       case (cmd: GetSlidesCmd) => cmd.slidesInfo = ContentManager.getSlidesInfo(cmd.lectureNumber)
 
+      case (cmd: GetCurrentSlideCmd) =>
+        cmd.lectureNumber = model.lectureNumber
+        cmd.slideNumber = model.slideNumber
+        cmd.content = ContentManager.getSlideInfo(cmd.lectureNumber, cmd.slideNumber)
+
       case (cmd: GetCurrentLectureCmd) =>
         cmd.lectureNumber = model.lectureNumber
+        cmd.content = ContentManager.getLectureDescription(cmd.lectureNumber)
 
       case _ => throw new Exception("Unexpected state and command")
     }
