@@ -19,6 +19,7 @@ import javafx.scene.paint.{Stop, CycleMethod, RadialGradient}
 import javafx.geometry.Pos
 import java.net.URI
 import javafx.scene.control.Tooltip
+import javafx.scene.Cursor
 
 class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   viewer =>
@@ -41,53 +42,31 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
   controller.executeCommand(viewer, new WatchNewsCmd)
 
   val socialButtons = new HBox {
-    /*
-    val twitterButton = new Button {
-      graphic = new ImageView {
-        image = "resource/Twitter-icon.png"
+
+    def getButton(pathToIcon: String, uriPath: String) = {
+      new ImageView {
+        image = pathToIcon
         fitHeight = 32
         fitWidth = 32
+        onMouseClicked = ((x: MouseEvent) => {
+          println("DEBUG: button is clicked. Go to: " + uriPath)
+          val u = new URI(uriPath)
+          java.awt.Desktop.getDesktop.browse(u)
+        })
+
+        cursor = Cursor.HAND
       }
-      maxWidth = 32
-      maxHeight = 32
-    }
-    val facebookButton = new Button {
-      graphic = new ImageView {
-        image = "resource/facebook-icon.png"
-        fitHeight = 32
-        fitWidth = 32
-      }
-      maxWidth = 32
-      maxHeight = 32
-    }
-    */
-
-    // TODO: Add LinkedIn, Youtube, RSS social buttons
-
-    val twitterButton = new ImageView {
-      image = "resource/Twitter-icon.png"
-      fitHeight = 32
-      fitWidth = 32
-      onMouseClicked = ((x: MouseEvent) => {
-        println("DEBUG: twitter button is clicked")
-        val u = new URI("http://twitter.com")
-        java.awt.Desktop.getDesktop.browse(u)
-      })
     }
 
-    val facebookButton = new ImageView {
-      image = "resource/facebook-icon.png"
-      fitHeight = 32
-      fitWidth = 32
-      onMouseClicked = ((x: MouseEvent) => {
-        println("DEBUG: facebook button is clicked")
-        val u = new URI("http://facebook.com")
-        java.awt.Desktop.getDesktop.browse(u)
-      })
-    }
+    val twitterButton = getButton("resource/Twitter-icon.png", "http://twitter.com")
+    val facebookButton = getButton("resource/facebook-icon.png", "http://facebook.com")
+    val linkedinButton = getButton("resource/linkedin-icon.png", "http://linkedin.com")
+    val rssButton = getButton("resource/rss-icon.jpg", "http://parallel-compute.com/news/")
+    val youtubeButton = getButton("resource/youtube-icon.jpg", "http://youtube.com")
 
-    content = List(twitterButton, facebookButton)
+    content = List(twitterButton, facebookButton, linkedinButton, youtubeButton, rssButton)
     alignment = Pos.BOTTOM_RIGHT
+    padding = Insets(5, 5, 5, 5)
   }
 
   def updateNews(news: List[String]) = {
@@ -118,11 +97,12 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
 
   def rightPane = new VBox {
     alignment = Pos.TOP_RIGHT
+    //padding = Insets(20, 20, 0, 0)
 
     val questionTextArea = new TextArea {
-      padding = Insets(20, 20, 20, 20)
+      //padding = Insets(20, 20, 20, 20)
 
-      prefHeight <== scene.height * 0.3
+      prefHeight <== scene.height * 0.5
       val msg = "Type your question or query here and click \"send\" to receive a consultation"
       text = msg
       //tooltip = new Tooltip(msg)
@@ -150,11 +130,13 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
           java.awt.Desktop.getDesktop.browse(u)
         })
         //fitWidth = 200
+
+        cursor = Cursor.HAND
       },
       new TextArea {
         text = news
         prefWidth = banner_width
-        prefHeight <== scene.height * 0.4
+        prefHeight <== scene.height * 0.5
         wrapText = true
         editable = false
       },
@@ -231,8 +213,9 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
 
               image = "resource/Silver-Play-Button.jpg"
 
-              fitHeight = 100.
-              fitWidth = 100.
+              fitHeight = 200.
+              fitWidth = 200.
+              cursor = Cursor.HAND
 
               onMouseClicked = ((x: MouseEvent) => {
                 println("DEBUG: View slides")
@@ -247,11 +230,12 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
 
       content = List(
         new HBox {
+          prefWidth <== scene.width
           translateX = 30.
 
           val lectureButtons = for (ls <- lecturesDescriptions) yield {
             new Button {
-              minWidth = 150.
+              //prefWidth = 150.
               text = ls.information
 
               onMouseClicked = ((x: MouseEvent) => {
@@ -268,7 +252,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
         },
         socialButtons)
 
-      padding = Insets(5, 5, 5, 5)
+      //padding = Insets(5, 5, 5, 5)
     }
 
     content.right = rightPane
@@ -318,7 +302,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
 
       content = List(
         new Button {
-          text = "Lectures\nselection"
+          text = "Lecture\nselection"
 
           //translateY <== h / 2.0 - header_height - 10
           onMouseClicked = mouseClickedHandler((_: MouseEvent))
@@ -360,13 +344,13 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
     }
 
     content.center = new GridPane {
-      padding = Insets(20, 0, 0, 20)
+      //padding = Insets(20, 0, 0, 20)
 
       content = List(centralImage)
     }
 
     content.left = new VBox {
-      padding = Insets(20, 0, 0, 10)
+      //padding = Insets(20, 0, 0, 10)
 
       //      def mouseClickedHandler(x: MouseEvent) = {
       //        println("DEBUG: Lecture selected " + x)
@@ -421,7 +405,7 @@ class Viewer(controller: Controller, scene: Scene) extends ViewerAbstract {
     }
 
     content.bottom = new VBox {
-      padding = Insets(5, 5, 5, 5)
+      //padding = Insets(5, 5, 5, 5)
 
       content = List(
         slideNavigationBox,

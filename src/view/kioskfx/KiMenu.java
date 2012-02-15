@@ -129,12 +129,12 @@ public class KiMenu {
                         TextArea textArea = new TextArea();
                         textArea.translateXProperty().bind(width.subtract(textArea.widthProperty()).subtract(100));
                         textArea.translateYProperty().bind(height.subtract(250));
-
+/*
                         for (Tweet tweet : result.getTweets()) {
                             //System.out.println(tweet.getFromUser() + ":" + tweet.getText());
                             textArea.setText(textArea.getText() + tweet.getFromUser() + ":" + tweet.getText() + "\n");
                         }
-
+*/
                         textArea.minHeightProperty().set(200);
                         textArea.minWidthProperty().set(900);
 

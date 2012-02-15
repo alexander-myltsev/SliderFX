@@ -78,6 +78,7 @@ initialCommands := """
 mainClass in (Compile, run) := Some("guifx.View")
 //mainClass in (Compile, run) := Some("scalafx.JumpingFrogsPuzzle")
 //mainClass in (Compile, run) := Some("bindingex2.BindingEx2scala")
+//mainClass in (Compile, run) := Some("WebViewPdfLaunch")
 
 // add <base>/input to the files that '~' triggers on
 watchSources <+= baseDirectory map {
@@ -143,7 +144,8 @@ parallelExecution in Test := false
 // set the location of the JDK to use for compiling Java code.
 // if 'fork' is true, this is used for 'run' as well
 //javaHome := Some(file("/Library/Java/JavaVirtualMachines/1.6.0_24-b07-330.jdk/Contents/Home"))
-javaHome := Some(file("c:/Java/jdk1.6.0_25"))
+javaHome := Some(file("c:/Java/jdk1.6.0"))
+//javaHome := Some(file("c:/Java/jdk1.7.0"))
 
 // Use Scala from a directory on the filesystem instead of retrieving from a repository
 // scalaHome := Some(file("/Users/Sven/scala-2.9.0.1/"))
