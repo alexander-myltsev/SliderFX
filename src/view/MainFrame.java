@@ -1,146 +1,22 @@
 package view;
 
+import controller.Controller;
+import controller.GetCurrentLectureCmd;
+import controller.LectureDescription;
+import controller.SelectLectureCmd;
 import net.miginfocom.swing.MigLayout;
 
-import javax.imageio.ImageIO;
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.Security;
 import java.util.ArrayList;
-import java.util.Properties;
-
-class JImagePanel extends JPanel {
-
-    private BufferedImage image;
-
-    private static BufferedImage overlayImages(BufferedImage bgImage, BufferedImage fgImage) {
-
-        if (fgImage.getHeight() > bgImage.getHeight() || fgImage.getWidth() > fgImage.getWidth()) {
-            JOptionPane.showMessageDialog(null,
-                    "Foreground Image Is Bigger In One or Both Dimensions"
-                            + "\nCannot proceed with overlay."
-                            + "\n\n Please use smaller Image for foreground");
-            return bgImage;
-        }
-
-        Graphics2D g = bgImage.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.drawImage(bgImage, 0, 0, null);
-        float alpha = 0.2f;
-        AlphaComposite composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
-        g.setComposite(composite);
-        g.drawImage(fgImage, 350, 200, null);
-
-        g.dispose();
-        return bgImage;
-    }
-
-    public JImagePanel(String path, boolean isPlayable) {
-        try {
-            image = ImageIO.read(new File(path));
-            if (isPlayable)
-                image = JImagePanel.overlayImages(image, ImageIO.read(new File("resource/Silver-Play-Button.jpg")));
-            Border blackline = BorderFactory.createLineBorder(Color.black);
-            setBorder(blackline);
-        } catch (IOException ex) {
-            // handle exception...
-        }
-    }
-
-    public void updateImage(String path, boolean isPlayable) {
-        try {
-            image = ImageIO.read(new File(path));
-            if (isPlayable)
-                image = JImagePanel.overlayImages(image, ImageIO.read(new File("resource/Silver-Play-Button.jpg")));
-            repaint();
-        } catch (IOException ex) {
-            // handle exception...
-        }
-    }
-
-    @Override
-    public void paintComponent(Graphics g) {
-        /*
-        int w = image.getWidth() / 2;
-        int h = image.getHeight() / 2;
-        int xStart = (getWidth() - w) / 2;
-        int yStart = (getHeight() - h) / 2;
-        g.drawImage(image.getScaledInstance(w, h, Image.SCALE_SMOOTH), xStart, yStart, null);
-        */
-
-        float fitToFrameScale = Math.min((float) getWidth() / (float) image.getWidth(), (float) getHeight() / (float) image.getHeight());
-        int widthScaled = (int) (image.getWidth() * fitToFrameScale);
-        int heightScaled = (int) (image.getHeight() * fitToFrameScale);
-        int xStart = (getWidth() - widthScaled) / 2;
-        int yStart = (getHeight() - heightScaled) / 2;
-        g.drawImage(image.getScaledInstance(widthScaled, heightScaled, Image.SCALE_SMOOTH), xStart, yStart, null);
-    }
-}
-
-class GoogleMailer {
-
-    private static final String SMTP_HOST_NAME = "smtp.gmail.com";
-    private static final String SMTP_PORT = "465";
-    private static final String emailMsgTxt = "Test Message Contents";
-    private static final String emailSubjectTxt = "A test from gmail";
-    private static final String emailFromAddress = "";
-    private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
-    private static final String[] sendTo = {""};
-
-
-    public void sendSSLMessage(String recipients[], String subject,
-                               String message, String from) throws MessagingException {
-        boolean debug = true;
-
-        Properties props = new Properties();
-        props.put("mail.smtp.host", SMTP_HOST_NAME);
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.debug", "true");
-        props.put("mail.smtp.port", SMTP_PORT);
-        props.put("mail.smtp.socketFactory.port", SMTP_PORT);
-        props.put("mail.smtp.socketFactory.class", SSL_FACTORY);
-        props.put("mail.smtp.socketFactory.fallback", "false");
-
-        Session session = Session.getDefaultInstance(props,
-                new javax.mail.Authenticator() {
-
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication("alexander.myltsev@gmail.com", "My_password");
-                    }
-                });
-
-        session.setDebug(debug);
-
-        Message msg = new MimeMessage(session);
-        InternetAddress addressFrom = new InternetAddress(from);
-        msg.setFrom(addressFrom);
-
-        InternetAddress[] addressTo = new InternetAddress[recipients.length];
-        for (int i = 0; i < recipients.length; i++) {
-            addressTo[i] = new InternetAddress(recipients[i]);
-        }
-        msg.setRecipients(Message.RecipientType.TO, addressTo);
-
-// Setting the Subject and Content Type
-        msg.setSubject(subject);
-        msg.setContent(message, "text/plain");
-        Transport.send(msg);
-    }
-}
 
 /*
 class SoundPlayer {
@@ -191,8 +67,30 @@ public class MainFrame {
     private int currentHeight = 0;
     private int currentWidth = 0;
     private String textOfQuestion = "\n\n\nType your question or query here and click \"send\" to receive a consultation";
-    private int lectureNumber = 1;
-    private int slideNumber = 1;
+    //private int lectureNumber = 1;
+    //private int slideNumber = 1;
+
+    private String news = "<h2>Latest News</h2>\t\t<h3>February 1, 2012 &nbsp;&nbsp;&nbsp;&nbsp; </h3>\n" +
+            "\t\t<a href=\"http://cuda-course.eventbrite.com/\">5-8 february On-site training and Consultancy and a 4 day advanced CUDA course at  Irish Supercomputing Center ICHEC, Dublin</a>\n" +
+            "\n" +
+            "\t\t<br/><br/>\n" +
+            "\n" +
+            "\t\t<h3>January 16, 2012 &nbsp;&nbsp;&nbsp;&nbsp; </h3>\n" +
+            "\t\t<a href=\"http://parallel-compute.com/education/plan\">January 16-18, 2012. A three day CUDA course at the Technical University of Munich. Germany.</a>\n" +
+            "\t\t\n" +
+            "\t\t<br/><br/>\n" +
+            "\t\n" +
+            "\t\t\n" +
+            "\t\t<h3>December 12, 2011 &nbsp;&nbsp;&nbsp;&nbsp;</h3>\n" +
+            "\t\tGPU Computing and CUDA.&nbsp;Supercomputing winter school at MSU for \"T-Platforms'\n" +
+            "\t\t\n" +
+            "\t";
+
+    private controller.Controller controller;
+
+    public MainFrame(Controller controller) {
+        this.controller = controller;
+    }
 
     private void paintGradient(Graphics g, JPanel panel) {
         //UIDefaults uid = UIManager.getDefaults();
@@ -209,6 +107,7 @@ public class MainFrame {
         g2d.fillRect(0, 0, d.width, d.height);
     }
 
+    /*
     private void postMail(String text) {
         //private void postMail(String recipients[], String subject, String message, String from) {
         String[] sendTo = {"edu.cuda@parallel-compute.com"};
@@ -226,6 +125,7 @@ public class MainFrame {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
+    */
 
     private JScrollPane createTextAreaScroll(int rows, int cols, boolean hasVerScroll) {
         final String text = "\n\n\nType your question or query here and click \"send\" to receive a consultation";
@@ -276,22 +176,6 @@ public class MainFrame {
         return scroll;
     }
 
-    private String news = "<h2>Latest News</h2>\t\t<h3>February 1, 2012 &nbsp;&nbsp;&nbsp;&nbsp; </h3>\n" +
-            "\t\t<a href=\"http://cuda-course.eventbrite.com/\">5-8 february On-site training and Consultancy and a 4 day advanced CUDA course at  Irish Supercomputing Center ICHEC, Dublin</a>\n" +
-            "\n" +
-            "\t\t<br/><br/>\n" +
-            "\n" +
-            "\t\t<h3>January 16, 2012 &nbsp;&nbsp;&nbsp;&nbsp; </h3>\n" +
-            "\t\t<a href=\"http://parallel-compute.com/education/plan\">January 16-18, 2012. A three day CUDA course at the Technical University of Munich. Germany.</a>\n" +
-            "\t\t\n" +
-            "\t\t<br/><br/>\n" +
-            "\t\n" +
-            "\t\t\n" +
-            "\t\t<h3>December 12, 2011 &nbsp;&nbsp;&nbsp;&nbsp;</h3>\n" +
-            "\t\tGPU Computing and CUDA.&nbsp;Supercomputing winter school at MSU for \"T-Platforms'\n" +
-            "\t\t\n" +
-            "\t";
-
     private ArrayList<JButton> getSocialButtons() {
         String[][] pathsToIcons = {
                 {"resource/rss.png", "rss-clicked"},
@@ -340,9 +224,16 @@ public class MainFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            lectureNumber = Integer.parseInt(e.getActionCommand());
-            String path = "resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG";
-            lectureContentViewer.updateImage(path, true);
+            //lectureNumber = Integer.parseInt(e.getActionCommand());
+            //String path = "resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG";
+            //lectureContentViewer.updateImage(path, true);
+
+            int lectNum = Integer.parseInt(e.getActionCommand());
+            SelectLectureCmd command = new SelectLectureCmd(lectNum);
+            controller.executeCommand(command);
+            LectureDescription lectureDescription = command.lectureDescription();
+
+            String path = "resource/Lectures/Lecture" + lectNum + "/Slide1.PNG"; // TODO: finish it
         }
     }
 
@@ -358,8 +249,9 @@ public class MainFrame {
             }
         };
 
-
-        JImagePanel lectureContentViewer = new JImagePanel("resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG", true);
+        GetCurrentLectureCmd getCurrentLectureCmd = new GetCurrentLectureCmd();
+        controller.executeCommand(getCurrentLectureCmd);
+        JImagePanel lectureContentViewer = new JImagePanel("resource/Lectures/Lecture" + getCurrentLectureCmd.lectureNumber() + "/Slide1.PNG", true);
         lectureContentViewer.setCursor(new Cursor(Cursor.HAND_CURSOR));
         lectureContentViewer.addMouseListener(new MouseAdapter() {
             @Override
@@ -402,7 +294,8 @@ public class MainFrame {
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                postMail(textOfQuestion);
+                //postMail(textOfQuestion);
+                System.out.println("!!! NOT IMPLEMENTED !!!");
             }
         });
         return sendButton;
@@ -449,7 +342,9 @@ public class MainFrame {
             }
         };
 
-        final JImagePanel slideSelectorPanel = new JImagePanel("resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG", false);
+        GetCurrentLectureCmd getCurrentLectureCmd = new GetCurrentLectureCmd();
+        controller.executeCommand(getCurrentLectureCmd);
+        final JImagePanel slideSelectorPanel = new JImagePanel("resource/Lectures/Lecture" + getCurrentLectureCmd.lectureNumber() + "/Slide1.PNG", false);
 
         for (int i = 1; i < 10; i++) {
             JButton slideButton = new JButton("Slide " + i);
@@ -457,8 +352,9 @@ public class MainFrame {
             slideButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    slideNumber = slideNum;
-                    String path = "resource/Lectures/Lecture" + lectureNumber + "/Slide" + slideNumber + ".PNG";
+                    // TODO: FIX IT
+                    //slideNumber = slideNum;
+                    String path = "resource/Lectures/Lecture" + 1 + "/Slide" + 1 + ".PNG";
                     slideSelectorPanel.updateImage(path, false);
                 }
             });
@@ -545,7 +441,7 @@ public class MainFrame {
 
     JFrame frame = new JFrame("CourseGUI");
 
-    public static void main(final String[] args) {
+    public static void launch(final Controller controller) {
         Font globalFont = new Font("Tahoma", Font.PLAIN, 12);
         setUIFont(new javax.swing.plaf.FontUIResource(globalFont));
 
@@ -562,7 +458,7 @@ public class MainFrame {
                 System.out.println("Width: " + dimension.width);
                 System.out.println("Height: " + dimension.height);
 
-                final MainFrame mainFrame = new MainFrame();
+                final MainFrame mainFrame = new MainFrame(controller);
 
                 mainFrame.currentHeight = (int) (dimension.height * 0.8);
                 mainFrame.currentWidth = (int) (dimension.width * 0.8);

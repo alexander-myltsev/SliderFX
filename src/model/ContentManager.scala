@@ -1,6 +1,6 @@
 package model.lectures
 
-import _root_.controller.{SlideInfo, LectureDescription}
+import controller.{SlideInfo, LectureDescription}
 
 object ContentManager {
   def getLecturesDescriptions: List[LectureDescription] = {
