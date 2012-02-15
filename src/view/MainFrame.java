@@ -328,10 +328,11 @@ public class MainFrame {
     }
 
     private JPanel createSlidesSelectorPanel() {
-        JPanel panel = new JPanel(new MigLayout(
+        MigLayout migLayout = new MigLayout(
                 "insets 10",
                 "[][grow,fill][]",
-                "[grow,fill][]"), true) {
+                "[grow,fill][]");
+        JPanel panel = new JPanel(migLayout, true) {
             @Override
             protected void paintComponent(Graphics g) {
                 paintGradient(g, this);
@@ -360,12 +361,12 @@ public class MainFrame {
         }
 
         panel.add(slideSelectorPanel, "grow");
-
         panel.add(createBanner(), "w 200!, h 100!, cell 2 0,flowy");
         panel.add(createNewsPanel(news, true), "w 200!, h 200!, grow, cell 2 0,flowy");
         panel.add(new JLabel("Ask a question"), "gapx push, cell 2 0");
         panel.add(createTextAreaScroll(4, 30, true), "w 200!, grow, cell 2 0,flowy");
         panel.add(createSendButton(), "cell 2 0, gapx push, gapy 0px");
+        panel.add(new JAudioPanel(), "cell 1 1");
 
         final JButton playPauseButton = new JButton("||");
         playPauseButton.addActionListener(new ActionListener() {
@@ -378,12 +379,12 @@ public class MainFrame {
                 }
             }
         });
-        panel.add(playPauseButton, "cell 1 1,w 50!,h 35!");
-        panel.add(new JSlider(0, 100, 0), "cell 1 1,growx 90,h 35!");
+        //panel.add(playPauseButton, "cell 1 1,w 50!,h 35!");
+        //panel.add(new JSlider(0, 100, 0), "cell 1 1,growx 90,h 35!");
         //panel.add(new JButton("Mute"), "cell 1 1,w 65!");
-        panel.add(new JLabel(new ImageIcon("resource/volume+icon.jpg")), "cell 1 1,w 30!,h 35!");
-        JSlider jSlider = new JSlider(0, 100, 100);
-        panel.add(jSlider, "cell 1 1,w 100!,h 35!");
+        //panel.add(new JLabel(new ImageIcon("resource/volume+icon.jpg")), "cell 1 1,w 30!,h 35!");
+        //JSlider jSlider = new JSlider(0, 100, 100);
+        //panel.add(jSlider, "cell 1 1,w 100!,h 35!");
 
         JButton backToLectureSelectionButton = new JButton("<html><p style=\"text-align: center;\">Lecture<br/>selection</p></html>");
         backToLectureSelectionButton.addActionListener(new ActionListener() {
@@ -465,8 +466,11 @@ public class MainFrame {
                 int startY = (dimension.height - mainFrame.currentHeight) / 2;
 
                 //JFrame frame = new JFrame("CourseGUI");
+
+                // MAIN PANEL SELECTOR
                 mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
                 //mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
+
                 mainFrame.frame.pack();
                 mainFrame.frame.setSize(mainFrame.currentWidth, mainFrame.currentHeight);
                 mainFrame.frame.setLocation(startX, startY);
@@ -493,6 +497,15 @@ public class MainFrame {
                 paintGradient(g, this);
             }
         };
+
+        /*
+        String path = "file:E:\\temp\\music\\music\\onclassical_demo_fiati-di-parma_thuille_terzo-tempo_sestetto_small-version.wav";
+        MediaPlayer p = new MediaPlayer();
+        p.setMediaLocator(new MediaLocator(path));
+        p.prefetch();
+        p.start();
+        mainPanel.add(p);
+        */
 
         //mainPanel.add(new JTextField("Login"), "wrap, w 200!");
         //mainPanel.add(new JTextField("String to send"), "wrap, w 200!");
