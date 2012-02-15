@@ -17,6 +17,10 @@ case class SelectLectureCmd(lectureNumber: Int) extends Command {
   var lectureDescription: LectureDescription = null
 }
 
+case class SelectSlideCmd(slideNumber: Int) extends Command {
+  var slideInfo: SlideInfo = null
+}
+
 case class GetCurrentLectureCmd() extends Command {
   var lectureNumber: Int = -1
   var content: LectureDescription = null
@@ -27,8 +31,6 @@ case class GetCurrentSlideCmd() extends Command {
   var slideNumber: Int = -1
   var content: SlideInfo = null
 }
-
-case class SelectSlideCmd(slideNumber: Int) extends Command
 
 case class GetLecturesDescriptionsCmd() extends Command {
   var lecturesDescriptions: List[LectureDescription] = null
@@ -59,9 +61,9 @@ class ControllerImplementation(model: Model) extends Controller {
       case (cmd: GetLecturesDescriptionsCmd) => cmd.lecturesDescriptions = ContentManager.getLecturesDescriptions
 
       case (cmd: SelectSlideCmd) =>
-        //clientState.slideNumber = cmd.slideNumber
-        //viewer.setSlide(clientState.slideNumber)
-        println("slide selected")
+        val slideNumber = cmd.slideNumber
+        model.slideNumber = slideNumber
+        cmd.slideInfo = ContentManager.getSlideInfo(model.lectureNumber, slideNumber)
       case (cmd: GetSlidesCmd) => cmd.slidesInfo = ContentManager.getSlidesInfo(cmd.lectureNumber)
 
       case (cmd: GetCurrentSlideCmd) =>

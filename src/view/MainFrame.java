@@ -351,9 +351,9 @@ public class MainFrame {
                     // TODO: FIX IT
                     //slideNumber = slideNum;
                     //String path = "resource/Lectures/Lecture" + 1 + "/Slide" + 1 + ".PNG";
-                    GetCurrentSlideCmd getCurrentSlideCmd1 = new GetCurrentSlideCmd();
-                    controller.executeCommand(getCurrentSlideCmd1);
-                    slideSelectorPanel.updateImage(getCurrentSlideCmd1.content().content(), false);
+                    SelectSlideCmd selectSlideCmd = new SelectSlideCmd(slideNum);
+                    controller.executeCommand(selectSlideCmd);
+                    slideSelectorPanel.updateImage(selectSlideCmd.slideInfo().content(), false);
                 }
             });
             panel.add(slideButton, "cell 0 0,flowy,sg g1,w 80!");
