@@ -14,7 +14,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
+interface JAudioPanelListener {
+    void trackIsEnded();
+}
+
 public class JAudioPanel extends JPanel {
+    private JAudioPanelListener jAudioPanelListener = null;
+    private Player audioPlayer;
+
     public JAudioPanel() {
         try {
             this.setLayout(new MigLayout("", "[][grow,fill][][]", "[]"));
@@ -23,11 +30,12 @@ public class JAudioPanel extends JPanel {
             String path = "E:/temp/music/music/onclassical_demo_fiati-di-parma_thuille_terzo-tempo_sestetto_small-version.wav";
             File audioFile = new File(path);
 
-            final Player audioPlayer = Manager.createRealizedPlayer(audioFile.toURL());
+            audioPlayer = Manager.createRealizedPlayer(audioFile.toURL());
+            audioPlayer.start();
 
             final JButton jButton = new JButton("|>");
             jButton.addActionListener(new ActionListener() {
-                private boolean isPlaying = false;
+                private boolean isPlaying = true;
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -90,5 +98,12 @@ public class JAudioPanel extends JPanel {
         //panel.add(controlPanelComponent, "cell 1 2");
     }
 
+    void addListener(JAudioPanelListener jAudioPanelListener) {
+        this.jAudioPanelListener = jAudioPanelListener;
+    }
 
+    public void stop() {
+        audioPlayer.stop();
+        audioPlayer.close();
+    }
 }

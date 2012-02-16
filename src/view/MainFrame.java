@@ -15,57 +15,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-/*
-class SoundPlayer {
-    private AudioInputStream audioInputStream;
-    private Clip clip;
-
-    SoundPlayer(String url) {
-        try {
-            audioInputStream = AudioSystem.getAudioInputStream(new FileInputStream(url));
-            clip = AudioSystem.getClip();
-        } catch (LineUnavailableException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (UnsupportedAudioFileException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-    }
-
-    //public static synchronized void playSound(final String url) {
-    public synchronized void playSound() {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    Clip clip = AudioSystem.getClip();
-                    //AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(MainFrame.class.getResourceAsStream("/path/to/sounds/" + url));
-                    clip.open(audioInputStream);
-                    clip.start();
-                } catch (Exception e) {
-                    System.err.println(e.getMessage());
-                }
-            }
-        }).start();
-    }
-
-    public void stopSound() {
-        clip.stop();
-    }
-
-    public void resumeSound() {
-        clip.start();
-    }
-}
-*/
-
 public class MainFrame {
     private static final boolean OPAQUE = false;
     private int currentHeight = 0;
     private int currentWidth = 0;
     private String textOfQuestion = "\n\n\nType your question or query here and click \"send\" to receive a consultation";
-    //private int lectureNumber = 1;
-    //private int slideNumber = 1;
 
     private String news = "<h2>Latest News</h2>\t\t<h3>February 1, 2012 &nbsp;&nbsp;&nbsp;&nbsp; </h3>\n" +
             "\t\t<a href=\"http://cuda-course.eventbrite.com/\">5-8 february On-site training and Consultancy and a 4 day advanced CUDA course at  Irish Supercomputing Center ICHEC, Dublin</a>\n" +
@@ -366,31 +320,33 @@ public class MainFrame {
         panel.add(new JLabel("Ask a question"), "gapx push, cell 2 0");
         panel.add(createTextAreaScroll(4, 30, true), "w 200!, grow, cell 2 0,flowy");
         panel.add(createSendButton(), "cell 2 0, gapx push, gapy 0px");
-        panel.add(new JAudioPanel(), "cell 1 1");
+        final JAudioPanel jAudioPanel = new JAudioPanel();
+        panel.add(jAudioPanel, "cell 1 1");
 
-        final JButton playPauseButton = new JButton("||");
-        playPauseButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (playPauseButton.getText().equals("||")) {
-                    playPauseButton.setText("|>");
-                } else {
-                    playPauseButton.setText("||");
-                }
-            }
-        });
-        //panel.add(playPauseButton, "cell 1 1,w 50!,h 35!");
-        //panel.add(new JSlider(0, 100, 0), "cell 1 1,growx 90,h 35!");
-        //panel.add(new JButton("Mute"), "cell 1 1,w 65!");
-        //panel.add(new JLabel(new ImageIcon("resource/volume+icon.jpg")), "cell 1 1,w 30!,h 35!");
-        //JSlider jSlider = new JSlider(0, 100, 100);
-        //panel.add(jSlider, "cell 1 1,w 100!,h 35!");
+//        final JButton playPauseButton = new JButton("||");
+//        playPauseButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                if (playPauseButton.getText().equals("||")) {
+//                    playPauseButton.setText("|>");
+//                } else {
+//                    playPauseButton.setText("||");
+//                }
+//            }
+//        });
+//        panel.add(playPauseButton, "cell 1 1,w 50!,h 35!");
+//        panel.add(new JSlider(0, 100, 0), "cell 1 1,growx 90,h 35!");
+//        panel.add(new JButton("Mute"), "cell 1 1,w 65!");
+//        panel.add(new JLabel(new ImageIcon("resource/volume+icon.jpg")), "cell 1 1,w 30!,h 35!");
+//        JSlider jSlider = new JSlider(0, 100, 100);
+//        panel.add(jSlider, "cell 1 1,w 100!,h 35!");
 
         JButton backToLectureSelectionButton = new JButton("<html><p style=\"text-align: center;\">Lecture<br/>selection</p></html>");
         backToLectureSelectionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Back to lecture selection is clicked");
+                jAudioPanel.stop();
                 JPanel lectureSelectorPanel = createLectureSelectorPanel();
                 frame.setVisible(false);
                 frame.setContentPane(lectureSelectorPanel);
