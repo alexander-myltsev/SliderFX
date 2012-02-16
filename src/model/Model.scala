@@ -5,18 +5,17 @@ trait Model {
 
   def slideNumber_=(v: Int)
 
-
   def lectureNumber: Int
 
   def lectureNumber_=(v: Int)
 }
 
 class ModelImplementation() extends Model {
-  private var _slideNumber = 1
+  private val _slideNumbersPerLecture = Array(1, 1, 1, 1)
 
-  def slideNumber = _slideNumber
+  def slideNumber = _slideNumbersPerLecture(_lectureNumber)
 
-  def slideNumber_=(v: Int) = _slideNumber = v
+  def slideNumber_=(v: Int) = _slideNumbersPerLecture(_lectureNumber) = v
 
 
   private var _lectureNumber = 1
