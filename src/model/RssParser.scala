@@ -3,85 +3,65 @@ package model
 import scala.xml._
 import java.net.URL
 
+case class RssChannel(name: String, items: Seq[RssItem])
+
+case class RssItem(title: String, description: String, link: String)
+
+// TODO: process exceptions
+
 object RssReader {
   def main(args: Array[String]): Unit = {
-    val rssFeeds = combineFeeds(getRssFeeds("e:/temp/rss.txt"))
-    printFeeds(rssFeeds)
-    //writeFeeds(rssFeeds)
+    val rssChannels = extractRss("""http://www.scala-lang.org/featured/rss.xml""")
+    printChannels(rssChannels)
+    feedsToHtml(rssChannels)
   }
 
-  def getRssFeeds(fileName: String): List[(String, Seq[String])] = {
-    // Given a config file containing a list of rss feed URL's,
-    // returns a list with ('channel name', ['article 1', 'article 2'])
-    var baseList: List[(String, Seq[String])] = List()
-    getFileLines(fileName).map(extractRss).foldLeft(baseList) {
-      (l, r) => l ::: r.toList
-    }
-  }
-
-  def combineFeeds(feeds: List[(String, Seq[String])]): List[(String, Seq[String])] = {
-    // Cleanup function, given a list of feeds it combines duplicate channels.
-    def combinedFeed(feedName: String): Seq[String] = {
-      feeds.filter(_._1 == feedName).map(_._2).flatten
-    }
-
-    val feedNames = feeds.map(_._1).distinct
-
-    feedNames.map(x => (x, combinedFeed(x)))
-  }
-
-  def getFileLines(fileName: String): Array[String] = {
-    // Extracts the URL's from a file and breaks them up into individual strings.
-    scala.io.Source.fromFile(fileName).mkString.split("\n")
-  }
-
-  def extractRss(urlStr: String): Seq[(String, Seq[String])] = {
-    // Given a URL, returns a Seq of RSS data in the form:
-    // ("channel", ["article 1", "article 2"])
+  def extractRss(urlStr: String): Seq[RssChannel] = {
     val url = new URL(urlStr)
     val conn = url.openConnection
     val xml = XML.load(conn.getInputStream)
 
-    for (channel <- xml \\ "channel")
-    yield {
+    (xml \\ "channel").map(channel => {
       val channelTitle = (channel \ "title").text
-      val titles = extractRssTitles(channel)
-      (channelTitle, titles)
-    }
+      val rssItems = extractRssChannel(channel)
+      RssChannel(channelTitle, rssItems)
+    })
   }
 
-  def extractRssTitles(channel: Node): Seq[String] = {
-    // Given a channel node from an RSS feed, returns all of the article names
-    for (title <- (channel \\ "item") \\ "title") yield title.text
+  def printChannels(channels: Seq[RssChannel]): Unit = {
+    channels.foreach(channel => {
+      println("*** " + channel.name + " ***")
+      channel.items.foreach(item => {
+        println("\titem: " + item.title)
+        println("\tdescr: " + item.description)
+        println("\tlink: " + item.link)
+        println("--------------------")
+      })
+    })
   }
 
-  def printFeeds(feeds: List[(String, Seq[String])]): List[Seq[Unit]] = {
-    // Given a list of ("channel", ["article 1", "article 2"]), prints
-    //  them each to screen.
-    for (feed <- feeds) yield {
-      println("*** " + feed._1 + " ***")
-      for (title <- feed._2) yield println("\t" + title)
-    }
+  def extractRssChannel(rssChannel: Node): Seq[RssItem] = {
+    (rssChannel \\ "item").map(item => {
+      val title = (item \ "title").text
+      val description = (item \ "description").text
+      val link = (item \ "link").text
+      RssItem(title, description, link)
+    })
   }
 
-  def writeFeeds(feeds: List[(String, Seq[String])]) = {
-    // Given a list of ("channel", ["article 1", "article 2"]), generates
-    //  and writes an HTML document listing the articles with channel names
-    //  as headers.
+  def feedsToHtml(channels: Seq[RssChannel]) = {
     val html =
-      <html>
-        <title>Rss Feeds</title> <body>
-        {for (feed <- feeds) yield
+      <body>
+        {for (channel <- channels) yield
           <h2>
-            {feed._1}
+            {channel.name}
           </h2>
             <ul>
-              {for (title <- feed._2) yield <li>
-              {title}
+              {for (item <- channel.items) yield <li>
+              {item.title} <a href={ item.link }> { ">>" } </a>
             </li>}
             </ul>}
       </body>
-      </html>
 
     XML.saveFull("rss.html", html, "UTF-8", true, null)
   }
