@@ -412,8 +412,8 @@ public class MainFrame {
                 //JFrame frame = new JFrame("CourseGUI");
 
                 // MAIN PANEL SELECTOR
-                mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
-                //mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
+                //mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
+                mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
 
                 mainFrame.frame.pack();
                 mainFrame.frame.setSize(mainFrame.currentWidth, mainFrame.currentHeight);
@@ -435,16 +435,38 @@ public class MainFrame {
     }
 
     private JPanel createStartPanel() {
-        JPanel mainPanel = new JPanel(new MigLayout()) {
+        MigLayout colLM = new MigLayout(
+                "",
+                "[100px!][fill][grow][100px!]",
+                "[100px!][][][]");
+
+        JPanel panel = new JPanel(colLM) {
             @Override
             protected void paintComponent(Graphics g) {
                 paintGradient(g, this);
             }
         };
 
-        //mainPanel.add(new JTextField("Login"), "wrap, w 200!");
-        //mainPanel.add(new JTextField("String to send"), "wrap, w 200!");
-        //mainPanel.add(new JTextField("Your string"), "wrap, w 200!");
+        panel.add(new JLabel("Full Name:"), "cell 1 1");
+        panel.add(new JTextField(), "cell 2 1,growx,wrap");
+
+        panel.add(new JLabel("Email:"), "cell 1 2");
+        panel.add(new JTextField(), "cell 2 2,growx,wrap");
+
+        panel.add(new JLabel("Organization:"), "cell 1 3");
+        panel.add(new JTextField(), "cell 2 3,growx,wrap");
+
+        panel.add(new JLabel("Key to send:"), "cell 1 4");
+        JTextField keytosendText = new JTextField("SOMESTRINGBASEDONMOTHERBOARDIDANDPROCESSOR");
+        keytosendText.setEditable(false);
+        panel.add(keytosendText, "cell 2 4,growx,wrap");
+
+        panel.add(new JLabel("Enter key:"), "cell 1 5");
+        panel.add(new JTextField(), "cell 2 5,growx,wrap");
+
+        //panel.add(new JTextField("Login"), "wrap, w 200!");
+        //panel.add(new JTextField("String to send"), "wrap, w 200!");
+        //panel.add(new JTextField("Your string"), "wrap, w 200!");
         JButton registrationButton = new JButton("Pass registration");
         registrationButton.addActionListener(new ActionListener() {
             @Override
@@ -458,8 +480,9 @@ public class MainFrame {
                 frame.setVisible(true);
             }
         });
-        mainPanel.add(registrationButton);
 
-        return mainPanel;
+        panel.add(registrationButton, "cell 2 6,gapx push");
+
+        return panel;
     }
 }
