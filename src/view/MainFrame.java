@@ -321,6 +321,12 @@ public class MainFrame {
         panel.add(createTextAreaScroll(4, 30, true), "w 200!, grow, cell 2 0,flowy");
         panel.add(createSendButton(), "cell 2 0, gapx push, gapy 0px");
         final JAudioPanel jAudioPanel = new JAudioPanel();
+        jAudioPanel.addListener(new JAudioPanelListener() {
+            @Override
+            public void trackIsEnded() {
+                jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
+            }
+        });
         panel.add(jAudioPanel, "cell 1 1");
 
 //        final JButton playPauseButton = new JButton("||");
