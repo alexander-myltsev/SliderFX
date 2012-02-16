@@ -329,24 +329,6 @@ public class MainFrame {
         });
         panel.add(jAudioPanel, "cell 1 1");
 
-//        final JButton playPauseButton = new JButton("||");
-//        playPauseButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                if (playPauseButton.getText().equals("||")) {
-//                    playPauseButton.setText("|>");
-//                } else {
-//                    playPauseButton.setText("||");
-//                }
-//            }
-//        });
-//        panel.add(playPauseButton, "cell 1 1,w 50!,h 35!");
-//        panel.add(new JSlider(0, 100, 0), "cell 1 1,growx 90,h 35!");
-//        panel.add(new JButton("Mute"), "cell 1 1,w 65!");
-//        panel.add(new JLabel(new ImageIcon("resource/volume+icon.jpg")), "cell 1 1,w 30!,h 35!");
-//        JSlider jSlider = new JSlider(0, 100, 100);
-//        panel.add(jSlider, "cell 1 1,w 100!,h 35!");
-
         JButton backToLectureSelectionButton = new JButton("<html><p style=\"text-align: center;\">Lecture<br/>selection</p></html>");
         backToLectureSelectionButton.addActionListener(new ActionListener() {
             @Override
@@ -459,15 +441,6 @@ public class MainFrame {
                 paintGradient(g, this);
             }
         };
-
-        /*
-        String path = "file:E:\\temp\\music\\music\\onclassical_demo_fiati-di-parma_thuille_terzo-tempo_sestetto_small-version.wav";
-        MediaPlayer p = new MediaPlayer();
-        p.setMediaLocator(new MediaLocator(path));
-        p.prefetch();
-        p.start();
-        mainPanel.add(p);
-        */
 
         //mainPanel.add(new JTextField("Login"), "wrap, w 200!");
         //mainPanel.add(new JTextField("String to send"), "wrap, w 200!");

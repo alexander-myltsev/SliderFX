@@ -16,7 +16,7 @@ object ContentManager {
     val g: Graphics2D = bgImage.createGraphics
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g.drawImage(bgImage, 0, 0, null)
-    val alpha: Float = 0.2f
+    val alpha: Float = 0.7f
     val composite: AlphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha)
     g.setComposite(composite)
     g.drawImage(fgImage, 350, 200, null)
@@ -27,7 +27,7 @@ object ContentManager {
   def getLectureDescription(lectureNumber: Int): LectureDescription = {
     val previewPath = "resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG"
     val content = ImageIO.read(new File(previewPath))
-    val contentWithPlay = overlayImages(content, ImageIO.read(new File("resource/Silver-Play-Button.jpg")))
+    val contentWithPlay = overlayImages(content, ImageIO.read(new File("resource/button_play_big.png")))
     new LectureDescription(lectureNumber, "Lecture " + lectureNumber, contentWithPlay)
   }
 
