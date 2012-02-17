@@ -21,7 +21,7 @@ class SmtpMailer {
     private static final String[] sendTo = {""};
 
     public static void sendSSLMessage(String recipients[], String subject,
-                               String text, String from) throws MessagingException {
+                               String text, String pathToFile, String from) throws MessagingException {
         boolean debug = true;
 
         Properties props = new Properties();
@@ -54,23 +54,22 @@ class SmtpMailer {
         msg.setRecipients(Message.RecipientType.TO, addressTo);
 
 
-        msg.setSubject("Hello JavaMail Attachment");
+        msg.setSubject(subject);
 
 // Create the message part
         BodyPart messageBodyPart = new MimeBodyPart();
 
 // Fill the message
-        messageBodyPart.setText("Pardon Ideas");
+        messageBodyPart.setText(text);
 
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(messageBodyPart);
 
 // Part two is attachment
         messageBodyPart = new MimeBodyPart();
-        String filename = "resource/Lectures/Lecture1/Slide1.PNG";
-        DataSource source = new FileDataSource(filename);
+        DataSource source = new FileDataSource(pathToFile);
         messageBodyPart.setDataHandler(new DataHandler(source));
-        messageBodyPart.setFileName(filename);
+        messageBodyPart.setFileName(pathToFile);
         multipart.addBodyPart(messageBodyPart);
 
 // Put parts in message

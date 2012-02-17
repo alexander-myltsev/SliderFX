@@ -24,6 +24,10 @@ case class SelectSlideCmd(slideNumber: Int) extends Command {
   var slideInfo: SlideInfo = null
 }
 
+case class SelectNextSlideCmd() extends Command {
+  var slideInfo: SlideInfo = null
+}
+
 case class GetCurrentLectureCmd() extends Command {
   var lectureNumber: Int = -1
   var content: LectureDescription = null
@@ -66,6 +70,10 @@ class ControllerImplementation(model: Model) extends Controller {
         cmd.news = news.toList
         cmd.newsHtml = InformationProvider.channelsToHtml(news)
 
+      case (cmd: SelectNextSlideCmd) =>
+        model.slideNumber += 1
+        val si = ContentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
+        cmd.slideInfo = si
 
       case (cmd: SelectLectureCmd) =>
         val lectureNumber = cmd.lectureNumber
@@ -89,7 +97,8 @@ class ControllerImplementation(model: Model) extends Controller {
         cmd.content = ContentManager.getLectureDescription(cmd.lectureNumber)
 
       case (cmd: SendQuestionCmd) =>
-        InformationProvider.sendQuestion(cmd.text)
+        val si = ContentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
+        InformationProvider.sendQuestion("CourseGUI question", cmd.text, si.path)
 
       case _ => throw new Exception("Unexpected state and command")
     }

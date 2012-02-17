@@ -45,7 +45,7 @@ object ContentManager {
     val previewPath = "resource/Lectures/Lecture" + lectureNum + "/Slide" + slideNumber + ".PNG"
     val title = "Slide " + slideNumber
     val content = ImageIO.read(new File(previewPath))
-    new SlideInfo(slideNumber, title, content)
+    new SlideInfo(slideNumber, title, previewPath, content)
   }
 
   def getSlidesInfo(lectureNum: Int): List[SlideInfo] = {

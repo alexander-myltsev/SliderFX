@@ -15,7 +15,7 @@ class JImagePanel extends JPanel {
         setBorder(blackline);
     }
 
-    public void updateImage(BufferedImage image, boolean isPlayable) {
+    public void updateImage(BufferedImage image) {
         this.image = image;
         repaint();
     }

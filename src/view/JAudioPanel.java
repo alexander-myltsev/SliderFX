@@ -109,6 +109,8 @@ public class JAudioPanel extends JPanel {
 
     public void play(String path) {
         try {
+            audioPlayer.stop();
+            audioPlayer.close();
             audioPlayer = Manager.createRealizedPlayer(new File(path).toURL());
             audioPlayer.getGainControl().setLevel(0.5f);
             audioPlayer.start();

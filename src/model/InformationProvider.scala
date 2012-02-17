@@ -64,13 +64,13 @@ object InformationProvider {
     html.toString
   }
 
-  def sendQuestion(question: String): Unit = {
+  def sendQuestion(subject: String, question: String, filepath: String): Unit = {
     val sendTo: Array[String] = Array("sanok.m@gmail.com")
-    val emailMsgTxt: String = question
-    val emailSubjectTxt: String = "A test from edu-cuda"
+    //val emailMsgTxt: String = question
+    //val emailSubjectTxt: String = "A test from edu-cuda"
     val emailFromAddress: String = "edu.cuda@parallel-compute.com"
     Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider)
-    SmtpMailer.sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress)
+    SmtpMailer.sendSSLMessage(sendTo, subject, question, filepath, emailFromAddress)
     System.out.println("Sucessfully Sent mail to: " + sendTo.mkString(", "))
   }
 }

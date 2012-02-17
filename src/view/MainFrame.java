@@ -172,7 +172,7 @@ public class MainFrame {
             SelectLectureCmd command = new SelectLectureCmd(lectNum);
             controller.executeCommand(command);
             LectureDescription lectureDescription = command.lectureDescription();
-            lectureContentViewer.updateImage(lectureDescription.content(), true);
+            lectureContentViewer.updateImage(lectureDescription.content());
         }
     }
 
@@ -285,18 +285,18 @@ public class MainFrame {
         controller.executeCommand(getCurrentSlideCmd);
         final JImagePanel slideSelectorPanel = new JImagePanel(getCurrentSlideCmd.content().content());
 
+        final JAudioPanel jAudioPanel = new JAudioPanel();
+
         for (int i = 1; i < 10; i++) {
             JButton slideButton = new JButton("Slide " + i);
             final int slideNum = i;
             slideButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    // TODO: FIX IT
-                    //slideNumber = slideNum;
-                    //String path = "resource/Lectures/Lecture" + 1 + "/Slide" + 1 + ".PNG";
                     SelectSlideCmd selectSlideCmd = new SelectSlideCmd(slideNum);
                     controller.executeCommand(selectSlideCmd);
-                    slideSelectorPanel.updateImage(selectSlideCmd.slideInfo().content(), false);
+                    slideSelectorPanel.updateImage(selectSlideCmd.slideInfo().content());
+                    jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
                 }
             });
             panel.add(slideButton, "cell 0 0,flowy,sg g1,w 80!");
@@ -308,11 +308,13 @@ public class MainFrame {
         panel.add(new JLabel("Ask a question"), "gapx push, cell 2 0");
         panel.add(createTextAreaScroll(4, 30, true), "w 200!, grow, cell 2 0,flowy");
         panel.add(createSendButton(), "cell 2 0, gapx push, gapy 0px");
-        final JAudioPanel jAudioPanel = new JAudioPanel();
         jAudioPanel.addListener(new JAudioPanelListener() {
             @Override
             public void trackIsEnded() {
                 jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
+                SelectNextSlideCmd cmd = new SelectNextSlideCmd();
+                controller.executeCommand(cmd);
+                slideSelectorPanel.updateImage(cmd.slideInfo().content());
             }
         });
         panel.add(jAudioPanel, "cell 1 1");
