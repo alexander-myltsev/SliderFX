@@ -13,6 +13,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class MainFrame {
@@ -50,6 +51,7 @@ public class MainFrame {
         //System.out.println(news);
     }
 
+    /*
     private void paintGradient(Graphics g, JPanel panel) {
         //UIDefaults uid = UIManager.getDefaults();
         Graphics2D g2d = (Graphics2D) g;
@@ -64,6 +66,7 @@ public class MainFrame {
         g2d.setPaint(p);
         g2d.fillRect(0, 0, d.width, d.height);
     }
+    */
 
         String emailSubjectTxt = "A test from gmail";
         String emailFromAddress = "alexander.myltsev@gmail.com";
@@ -116,41 +119,40 @@ public class MainFrame {
         return scroll;
     }
 
-    private ArrayList<JButton> getSocialButtons() {
+    private ArrayList<JComponent> getSocialButtons() {
         String[][] pathsToIcons = {
-                {"resource/rss.png", "rss-clicked"},
-                {"resource/youtube.png", "youtube-clicked"},
-                {"resource/facebook.png", "facebook-clicked"},
-                {"resource/linkedin.png", "linkedin-clicked"},
-                {"resource/twitter.png", "twitter-clicked"}
+                {"resource/rss.png", "http://parallel-compute.com/news/"},
+                {"resource/youtube.png", "http://youtube.com"},
+                {"resource/facebook.png", "http://facebook.com"},
+                {"resource/linkedin.png", "http://linkedin.com"},
+                {"resource/twitter.png", "http://twitter.com"}
         };
-        ArrayList<JButton> buttons = new ArrayList<JButton>();
-        ActionListener socialButtonsEventListener = new ActionListener() {
+        ArrayList<JComponent> buttons = new ArrayList<JComponent>();
+        class SocialButtonsListener extends MouseAdapter {
+            private String siteToGo;
+
+            SocialButtonsListener(String siteToGo) {
+                this.siteToGo = siteToGo;
+            }
+
             @Override
-            public void actionPerformed(ActionEvent e) {
-                //System.out.println(e.toString());
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
                 try {
-                    URI u;
-                    if ("rss-clicked".equals(e.getActionCommand()))
-                        u = new URI("http://parallel-compute.com/news/");
-                    else if ("facebook-clicked".equals(e.getActionCommand())) u = new URI("http://facebook.com");
-                    else if ("linkedin-clicked".equals(e.getActionCommand())) u = new URI("http://linkedin.com");
-                    else if ("twitter-clicked".equals(e.getActionCommand())) u = new URI("http://twitter.com");
-                    else if ("youtube-clicked".equals(e.getActionCommand())) u = new URI("http://youtube.com");
-                    else u = new URI("http://parallel-compute.com");
-                    Desktop.getDesktop().browse(u);
-                } catch (URISyntaxException e1) {
-                    e1.printStackTrace(); // TODO: Process the error correctly.
+                    Desktop.getDesktop().browse(new URI(this.siteToGo));
                 } catch (IOException e1) {
-                    e1.printStackTrace(); // TODO: Process the error correctly.
+                    e1.printStackTrace();
+                } catch (URISyntaxException e1) {
+                    e1.printStackTrace();
                 }
             }
-        };
+        }
         for (int i = 0; i < pathsToIcons.length; i++) {
-            JButton button = new JButton("", new ImageIcon(pathsToIcons[i][0]));
-            button.addActionListener(socialButtonsEventListener);
-            button.setActionCommand(pathsToIcons[i][1]);
-            buttons.add(button);
+            URL iconURL = ClassLoader.getSystemResource(pathsToIcons[i][0]);
+            JLabel socialButtonLabel = new JLabel(new ImageIcon(iconURL));
+            socialButtonLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            socialButtonLabel.addMouseListener(new SocialButtonsListener(pathsToIcons[i][1]));
+            buttons.add(socialButtonLabel);
         }
         return buttons;
     }
@@ -182,10 +184,12 @@ public class MainFrame {
                 "[grow,fill][]",
                 "[grow,fill][]"), true
         ) {
+            /*
             @Override
             protected void paintComponent(Graphics g) {
                 paintGradient(g, this);
             }
+            */
         };
 
         GetCurrentLectureCmd getCurrentLectureCmd = new GetCurrentLectureCmd();
@@ -220,7 +224,7 @@ public class MainFrame {
             panel.add(lectureButton, "cell 0 1,h 35!,flowx");
         }
 
-        ArrayList<JButton> socialButtons = getSocialButtons();
+        ArrayList<JComponent> socialButtons = getSocialButtons();
         for (int i = 0; i < socialButtons.size(); i++) {
             panel.add(socialButtons.get(i), "gapx push,gapy push,w 35!,h 35!,cell 1 1");
         }
@@ -275,10 +279,12 @@ public class MainFrame {
                 "[][grow,fill][]",
                 "[grow,fill][]");
         JPanel panel = new JPanel(migLayout, true) {
+            /*
             @Override
             protected void paintComponent(Graphics g) {
                 paintGradient(g, this);
             }
+            */
         };
 
         GetCurrentSlideCmd getCurrentSlideCmd = new GetCurrentSlideCmd();
@@ -335,7 +341,7 @@ public class MainFrame {
         });
         panel.add(backToLectureSelectionButton, "w 80!,h 35!,cell 0 1");
 
-        ArrayList<JButton> socialButtons = getSocialButtons();
+        ArrayList<JComponent> socialButtons = getSocialButtons();
         for (int i = 0; i < socialButtons.size(); i++) {
             panel.add(socialButtons.get(i), "gapx push,gapy push,w 35!,h 35!,cell 2 1");
         }
@@ -344,7 +350,8 @@ public class MainFrame {
     }
 
     private JLabel createBanner() {
-        JLabel banner = new JLabel(new ImageIcon("resource/TESLA_200x100.jpg"));
+        URL bannerURL = ClassLoader.getSystemResource("resource/TESLA_200x100.jpg");
+        JLabel banner = new JLabel(new ImageIcon(bannerURL));
         banner.setCursor(new Cursor(Cursor.HAND_CURSOR));
         banner.addMouseListener(new MouseAdapter() {
             @Override
@@ -382,44 +389,45 @@ public class MainFrame {
             public void run() {
                 try {
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+
+                    Toolkit toolkit = Toolkit.getDefaultToolkit();
+                    Dimension dimension = toolkit.getScreenSize();
+                    System.out.println("Width: " + dimension.width);
+                    System.out.println("Height: " + dimension.height);
+
+                    final MainFrame mainFrame = new MainFrame(controller);
+
+                    mainFrame.currentHeight = (int) (dimension.height * 0.8);
+                    mainFrame.currentWidth = (int) (dimension.width * 0.8);
+
+                    int startX = (dimension.width - mainFrame.currentWidth) / 2;
+                    int startY = (dimension.height - mainFrame.currentHeight) / 2;
+
+                    //JFrame frame = new JFrame("CourseGUI");
+
+                    // MAIN PANEL SELECTOR
+                    mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
+                    //mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
+
+                    mainFrame.frame.pack();
+                    mainFrame.frame.setSize(mainFrame.currentWidth, mainFrame.currentHeight);
+                    mainFrame.frame.setLocation(startX, startY);
+                    mainFrame.frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                    mainFrame.frame.setVisible(true);
+
+                    mainFrame.frame.addComponentListener(new java.awt.event.ComponentAdapter() {
+                        public void componentResized(ComponentEvent event) {
+                            mainFrame.currentHeight = mainFrame.frame.getHeight();
+                            mainFrame.currentWidth = mainFrame.frame.getWidth();
+                            //mainFrame.currentHeight = Math.max(600, mainFrame.frame.getHeight());
+                            //mainFrame.currentWidth = Math.max(1200, mainFrame.frame.getWidth());
+                            //mainFrame.frame.setSize(mainFrame.currentWidth, mainFrame.currentHeight);
+                        }
+                    });
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-
-                Toolkit toolkit = Toolkit.getDefaultToolkit();
-                Dimension dimension = toolkit.getScreenSize();
-                System.out.println("Width: " + dimension.width);
-                System.out.println("Height: " + dimension.height);
-
-                final MainFrame mainFrame = new MainFrame(controller);
-
-                mainFrame.currentHeight = (int) (dimension.height * 0.8);
-                mainFrame.currentWidth = (int) (dimension.width * 0.8);
-
-                int startX = (dimension.width - mainFrame.currentWidth) / 2;
-                int startY = (dimension.height - mainFrame.currentHeight) / 2;
-
-                //JFrame frame = new JFrame("CourseGUI");
-
-                // MAIN PANEL SELECTOR
-                //mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
-                mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
-
-                mainFrame.frame.pack();
-                mainFrame.frame.setSize(mainFrame.currentWidth, mainFrame.currentHeight);
-                mainFrame.frame.setLocation(startX, startY);
-                mainFrame.frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                mainFrame.frame.setVisible(true);
-
-                mainFrame.frame.addComponentListener(new java.awt.event.ComponentAdapter() {
-                    public void componentResized(ComponentEvent event) {
-                        mainFrame.currentHeight = mainFrame.frame.getHeight();
-                        mainFrame.currentWidth = mainFrame.frame.getWidth();
-                        //mainFrame.currentHeight = Math.max(600, mainFrame.frame.getHeight());
-                        //mainFrame.currentWidth = Math.max(1200, mainFrame.frame.getWidth());
-                        //mainFrame.frame.setSize(mainFrame.currentWidth, mainFrame.currentHeight);
-                    }
-                });
             }
         });
     }
@@ -431,10 +439,12 @@ public class MainFrame {
                 "[100px!][][][]");
 
         JPanel panel = new JPanel(colLM) {
+            /*
             @Override
             protected void paintComponent(Graphics g) {
                 paintGradient(g, this);
             }
+            */
         };
 
         panel.add(new JLabel("Full Name:"), "cell 1 1");

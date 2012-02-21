@@ -5,6 +5,7 @@ import javax.imageio.ImageIO
 import scala.xml._
 import java.io.{FileReader, File}
 import scala.xml._
+import java.net.URL
 
 case class Slide(path: String, sound: String)
 
@@ -22,7 +23,7 @@ object ContentManager {
     val alpha: Float = 0.7f
     val composite: AlphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha)
     g.setComposite(composite)
-    g.drawImage(fgImage, 350, 200, null)
+    g.drawImage(fgImage, 410, 260, null)
     g.dispose
     bgImage
   }
@@ -30,7 +31,8 @@ object ContentManager {
   def getLectureDescription(lectureNumber: Int): LectureDescription = {
     val previewPath = "resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG"
     val content = ImageIO.read(new File(previewPath))
-    val contentWithPlay = overlayImages(content, ImageIO.read(new File("resource/button_play_big.png")))
+    val buttonPlayBigImgURL = ClassLoader.getSystemResource("resource/button_play_big.png")
+    val contentWithPlay = overlayImages(content, ImageIO.read(buttonPlayBigImgURL))
     new LectureDescription(lectureNumber, "Lecture " + lectureNumber, contentWithPlay)
   }
 

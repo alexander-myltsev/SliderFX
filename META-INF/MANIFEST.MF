@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Class-Path: miglayout-4.0-swing.jar mail.jar
-Main-Class: coursegui.MainFrame
+Class-Path: miglayout-4.0-swing.jar mail.jar jmf.jar scala-library.jar
+Main-Class: controller.Launcher
 

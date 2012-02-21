@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 interface JAudioPanelListener {
     void trackIsEnded();
@@ -32,9 +33,11 @@ public class JAudioPanel extends JPanel {
             audioPlayer.start();
             audioPlayer.getGainControl().setLevel(0.5f);
 
-            final ImageIcon pauseIcon = new ImageIcon("resource/button_pause.png");
-            final ImageIcon playIcon = new ImageIcon("resource/button_play.png");
-            //final JButton playPauseButton = new JButton(pauseIcon);
+            URL buttonPauseImgURL = ClassLoader.getSystemResource("resource/button_pause.png");
+            URL buttonPlayImgURL = ClassLoader.getSystemResource("resource/button_play.png");
+            final ImageIcon pauseIcon = new ImageIcon(buttonPauseImgURL);
+            final ImageIcon playIcon = new ImageIcon(buttonPlayImgURL);
+
             final JLabel playPauseButton = new JLabel(pauseIcon);
             playPauseButton.addMouseListener(new MouseAdapter() {
                 private boolean isPlaying = true;
@@ -96,7 +99,8 @@ public class JAudioPanel extends JPanel {
 
             this.add(playPauseButton, "h 35!,w 50!");
             this.add(audioPlayerLocator, "h 35!, growx");
-            this.add(new JLabel(new ImageIcon("resource/button_volume.png")), "h 35!,w 50!");
+            URL buttonVolumeImgURL = ClassLoader.getSystemResource("resource/button_volume.png");
+            this.add(new JLabel(new ImageIcon(buttonVolumeImgURL)), "h 35!,w 50!");
             this.add(volumeSlider, "h 35!,w 100!");
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
