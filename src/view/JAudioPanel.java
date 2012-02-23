@@ -4,8 +4,6 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.media.*;
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicSliderUI;
-import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
@@ -18,13 +16,14 @@ interface JAudioPanelListener {
 public class JAudioPanel extends JPanel {
     private JAudioPanelListener listener = null;
     private Player audioPlayer;
-    private JSlider audioPlayerLocator;
+    //private JSlider audioPlayerLocator;
+    private JProgressBar audioPlayerLocator;
     private int scale = 3;
 
     public JAudioPanel() {
         try {
             this.setLayout(new MigLayout("", "[][grow,fill][][]", "[]"));
-            this.setBackground(new Color(0, 0, 0, 0));
+            //this.setBackground(new Color(0, 0, 0, 0));
 
             String path = "E:/temp/music/music/onclassical_demo_ensemble-la-tempesta_porpora_iii-notturno_iii-lezione_live_small-version.wav";
             File audioFile = new File(path);
@@ -57,26 +56,22 @@ public class JAudioPanel extends JPanel {
             });
 
             int seconds = (int) audioPlayer.getDuration().getSeconds();
-            audioPlayerLocator = new JSlider(0, seconds * scale, 0);
-            audioPlayerLocator.setUI(new BasicSliderUI(audioPlayerLocator));
+            //audioPlayerLocator = new JSlider(0, seconds * scale, 0);
+            audioPlayerLocator = new JProgressBar(0, seconds * scale);
 
-            // TODO: Make it more user friendly
-            audioPlayerLocator.addMouseMotionListener(new MouseMotionListener() {
+            audioPlayerLocator.addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseDragged(MouseEvent e) {
+                public void mouseClicked(MouseEvent e) {
+                    float s = (float) e.getX() / (float) audioPlayerLocator.getWidth();
+                    audioPlayerLocator.setValue((int) (s * audioPlayerLocator.getMaximum()));
                     double seconds = (double) audioPlayerLocator.getValue() / (double) scale;
                     audioPlayer.setMediaTime(new Time(seconds));
-                }
-
-                @Override
-                public void mouseMoved(MouseEvent e) {
                 }
             });
 
             final JSlider volumeSlider = new JSlider(0, 100, 50);
-            volumeSlider.setUI(new BasicSliderUI(volumeSlider));
 
-            Timer timer = new Timer(300, new ActionListener() {
+            Timer timer = new Timer(1000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     float volume = (float) volumeSlider.getValue() / (float) volumeSlider.getMaximum();

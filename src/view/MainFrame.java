@@ -3,6 +3,7 @@ package view;
 import controller.*;
 import net.miginfocom.swing.MigLayout;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -10,13 +11,17 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
+// TODO: Make custom button
+
 public class MainFrame {
+    private static Font font = new Font("PT Sans", Font.PLAIN, 14);
     private static final boolean OPAQUE = false;
     private int currentHeight = 0;
     private int currentWidth = 0;
@@ -73,7 +78,7 @@ public class MainFrame {
     private JScrollPane createTextAreaScroll(int rows, int cols, boolean hasVerScroll) {
         final String text = "\n\n\nType your question or query here and click \"send\" to receive a consultation";
         final JTextArea ta = new JTextArea(textOfQuestion, rows, cols);
-        ta.setFont(UIManager.getFont("TextField.font"));
+        ta.setFont(font);
         ta.setWrapStyleWord(true);
         ta.setLineWrap(true);
 
@@ -194,7 +199,7 @@ public class MainFrame {
 
         GetCurrentLectureCmd getCurrentLectureCmd = new GetCurrentLectureCmd();
         controller.executeCommand(getCurrentLectureCmd);
-        JImagePanel lectureContentViewer = new JImagePanel(getCurrentLectureCmd.content().content());
+        final JImagePanel lectureContentViewer = new JImagePanel(getCurrentLectureCmd.content().content());
         lectureContentViewer.setCursor(new Cursor(Cursor.HAND_CURSOR));
         lectureContentViewer.addMouseListener(new MouseAdapter() {
             @Override
@@ -212,16 +217,46 @@ public class MainFrame {
 
         panel.add(createBanner(), "w 200!, h 100!, flowy, cell 1 0");
         panel.add(createNewsPanel(news, true), "w 200!, h 200!,flowy, cell 1 0");
-        panel.add(new JLabel("Ask a question"), "gapx push, cell 1 0");
+        JLabel askQuestionLabel = new JLabel("Ask a question");
+        askQuestionLabel.setFont(font);
+        panel.add(askQuestionLabel, "gapx push, cell 1 0");
         panel.add(createTextAreaScroll(4, 30, true), "w 200!, flowy, grow, cell 1 0");
-        panel.add(createSendButton(), "gapx push, gapy 0px, cell 1 0"); // pos visual.x2-pref visual.y2-pref-35
+        panel.add(createSendButton(), "gapx push, gapy 0px, cell 1 0, h 35!, w 70!"); // pos visual.x2-pref visual.y2-pref-35
 
-        LectureButtonListener lectureButtonActionListener = new LectureButtonListener(lectureContentViewer);
-        for (int i = 1; i <= 4; i++) {
-            JButton lectureButton = new JButton("Lecture " + i);
-            lectureButton.setActionCommand("" + i);
-            lectureButton.addActionListener(lectureButtonActionListener);
-            panel.add(lectureButton, "cell 0 1,h 35!,flowx");
+        //LectureButtonListener lectureButtonActionListener = new LectureButtonListener(lectureContentViewer);
+        URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
+
+        try {
+            final BufferedImage bufferedImage = ImageIO.read(buttonSlideURL);
+            for (int i = 1; i <= 4; i++) {
+                //JButton lectureButton = new JButton("Lecture " + i);
+                JLabel lectureButton = new JLabel("Lecture " + i, SwingConstants.CENTER) {
+                    @Override
+                    public void paint(Graphics g) {
+                        int imageWidth = bufferedImage.getWidth();
+                        int imageHeight = bufferedImage.getHeight();
+                        int x = (getWidth() - imageWidth) / 2;
+                        int y = (getHeight() - imageHeight) / 2 + 1;
+                        g.drawImage(bufferedImage.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
+                        super.paint(g);
+                    }
+                };
+                lectureButton.setFont(font);
+                lectureButton.setForeground(new Color(47, 103, 166));
+                final int finalI = i;
+                lectureButton.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        SelectLectureCmd command = new SelectLectureCmd(finalI);
+                        controller.executeCommand(command);
+                        LectureDescription lectureDescription = command.lectureDescription();
+                        lectureContentViewer.updateImage(lectureDescription.content());
+                    }
+                });
+                panel.add(lectureButton, "cell 0 1,h 35!,flowx");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
         ArrayList<JComponent> socialButtons = getSocialButtons();
@@ -232,15 +267,32 @@ public class MainFrame {
         return panel;
     }
 
-    private JButton createSendButton() {
-        JButton sendButton = new JButton("Send");
-        sendButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.executeCommand(new SendQuestionCmd(textOfQuestion));
-            }
-        });
-        return sendButton;
+    private JComponent createSendButton() {
+        URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
+        final BufferedImage bufferedImage;
+        try {
+            bufferedImage = ImageIO.read(buttonSlideURL);
+            JLabel sendButton = new JLabel("Send", SwingConstants.CENTER) {
+                public void paint(Graphics g) {
+                    int x = (getWidth() - bufferedImage.getWidth()) / 2;
+                    int y = (getHeight() - bufferedImage.getHeight()) / 2 + 1;
+                    g.drawImage(bufferedImage, x, y, null);
+                    super.paint(g);
+                }
+            };
+            sendButton.setFont(font);
+            sendButton.setForeground(new Color(47, 103, 166));
+            sendButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    controller.executeCommand(new SendQuestionCmd(textOfQuestion));
+                }
+            });
+            return sendButton;
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return null;
     }
 
     private JScrollPane createNewsPanel(String news, boolean hasVerScroll) {
@@ -248,6 +300,7 @@ public class MainFrame {
         ep.setContentType("text/html");
         ep.setText(news);
         ep.setEditable(false);
+        ep.setFont(font);
         ep.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
@@ -293,57 +346,87 @@ public class MainFrame {
 
         final JAudioPanel jAudioPanel = new JAudioPanel();
 
-        for (int i = 1; i < 10; i++) {
-            JButton slideButton = new JButton("Slide " + i);
-            final int slideNum = i;
-            slideButton.addActionListener(new ActionListener() {
+        URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
+        try {
+            final BufferedImage bufferedImage = ImageIO.read(buttonSlideURL);
+            //ImageIcon imageIcon = new ImageIcon(buttonSlideURL);
+            for (int i = 1; i < 19; i++) {
+                JLabel slideButton = new JLabel("Slide " + i, SwingConstants.CENTER) {
+                    public void paint(Graphics g) {
+                        int x = (getWidth() - bufferedImage.getWidth()) / 2;
+                        int y = (getHeight() - bufferedImage.getHeight()) / 2 + 1;
+                        g.drawImage(bufferedImage, x, y, null);
+                        super.paint(g);
+                    }
+                };
+                slideButton.setFont(font);
+                slideButton.setForeground(new Color(47, 103, 166));
+                final int slideNum = i;
+                slideButton.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        SelectSlideCmd selectSlideCmd = new SelectSlideCmd(slideNum);
+                        controller.executeCommand(selectSlideCmd);
+                        slideSelectorPanel.updateImage(selectSlideCmd.slideInfo().content());
+                        jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
+                    }
+                });
+                panel.add(slideButton, "cell 0 0,flowy,sg g1,w 80!");
+            }
+
+            panel.add(slideSelectorPanel, "grow");
+            panel.add(createBanner(), "w 200!, h 100!, cell 2 0,flowy");
+            panel.add(createNewsPanel(news, true), "w 200!, h 200!, grow, cell 2 0,flowy");
+            JLabel askQuestionLabel = new JLabel("Ask a question");
+            askQuestionLabel.setFont(font);
+            panel.add(askQuestionLabel, "gapx push, cell 2 0");
+            panel.add(createTextAreaScroll(4, 30, true), "w 200!, grow, cell 2 0,flowy");
+            panel.add(createSendButton(), "cell 2 0, gapx push, gapy 0px, h 35!, w 70!");
+            jAudioPanel.addListener(new JAudioPanelListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    SelectSlideCmd selectSlideCmd = new SelectSlideCmd(slideNum);
-                    controller.executeCommand(selectSlideCmd);
-                    slideSelectorPanel.updateImage(selectSlideCmd.slideInfo().content());
+                public void trackIsEnded() {
                     jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
+                    SelectNextSlideCmd cmd = new SelectNextSlideCmd();
+                    controller.executeCommand(cmd);
+                    slideSelectorPanel.updateImage(cmd.slideInfo().content());
                 }
             });
-            panel.add(slideButton, "cell 0 0,flowy,sg g1,w 80!");
-        }
+            panel.add(jAudioPanel, "cell 1 1");
 
-        panel.add(slideSelectorPanel, "grow");
-        panel.add(createBanner(), "w 200!, h 100!, cell 2 0,flowy");
-        panel.add(createNewsPanel(news, true), "w 200!, h 200!, grow, cell 2 0,flowy");
-        panel.add(new JLabel("Ask a question"), "gapx push, cell 2 0");
-        panel.add(createTextAreaScroll(4, 30, true), "w 200!, grow, cell 2 0,flowy");
-        panel.add(createSendButton(), "cell 2 0, gapx push, gapy 0px");
-        jAudioPanel.addListener(new JAudioPanelListener() {
-            @Override
-            public void trackIsEnded() {
-                jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
-                SelectNextSlideCmd cmd = new SelectNextSlideCmd();
-                controller.executeCommand(cmd);
-                slideSelectorPanel.updateImage(cmd.slideInfo().content());
+            //JButton backToLectureSelectionButton = new JButton("<html><p style=\"text-align: center;\">Lecture<br/>selection</p></html>");
+            JLabel backToLectureSelectionButton = new JLabel("<html><p style=\"text-align: center;\">Lecture<br/>selection</p></html>", SwingConstants.CENTER) {
+                public void paint(Graphics g) {
+                    int imageWidth = bufferedImage.getWidth();
+                    int imageHeight = bufferedImage.getHeight() * 2;
+                    int x = (getWidth() - imageWidth) / 2;
+                    int y = (getHeight() - imageHeight) / 2 + 1;
+                    g.drawImage(bufferedImage.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH), x, y, null);
+                    super.paint(g);
+                }
+            };
+            backToLectureSelectionButton.setFont(font);
+            backToLectureSelectionButton.setForeground(new Color(47, 103, 166));
+            backToLectureSelectionButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    System.out.println("Back to lecture selection is clicked");
+                    jAudioPanel.stop();
+                    JPanel lectureSelectorPanel = createLectureSelectorPanel();
+                    frame.setVisible(false);
+                    frame.setContentPane(lectureSelectorPanel);
+                    frame.pack();
+                    frame.setSize(currentWidth, currentHeight);
+                    frame.setVisible(true);
+                }
+            });
+            panel.add(backToLectureSelectionButton, "w 80!,h 40!,cell 0 1");
+
+            ArrayList<JComponent> socialButtons = getSocialButtons();
+            for (int i = 0; i < socialButtons.size(); i++) {
+                panel.add(socialButtons.get(i), "gapx push,gapy push,w 35!,h 35!,cell 2 1");
             }
-        });
-        panel.add(jAudioPanel, "cell 1 1");
-
-        JButton backToLectureSelectionButton = new JButton("<html><p style=\"text-align: center;\">Lecture<br/>selection</p></html>");
-        backToLectureSelectionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Back to lecture selection is clicked");
-                jAudioPanel.stop();
-                JPanel lectureSelectorPanel = createLectureSelectorPanel();
-                frame.setVisible(false);
-                frame.setContentPane(lectureSelectorPanel);
-                frame.pack();
-                frame.setSize(currentWidth, currentHeight);
-                frame.setVisible(true);
-            }
-        });
-        panel.add(backToLectureSelectionButton, "w 80!,h 35!,cell 0 1");
-
-        ArrayList<JComponent> socialButtons = getSocialButtons();
-        for (int i = 0; i < socialButtons.size(); i++) {
-            panel.add(socialButtons.get(i), "gapx push,gapy push,w 35!,h 35!,cell 2 1");
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
         return panel;
@@ -379,17 +462,45 @@ public class MainFrame {
         }
     }
 
-    JFrame frame = new JFrame("CourseGUI");
+    JFrame frame = new JFrame("Architecture and CUDA programming  model");
 
     public static void launch(final Controller controller) {
-        Font globalFont = new Font("Tahoma", Font.PLAIN, 12);
-        setUIFont(new javax.swing.plaf.FontUIResource(globalFont));
-
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    /*
+                    LookAndFeels:
+                    Metal
+                    Nimbus
+                    CDE/Motif
+                    Windows
+                    Windows Classic
 
+                    for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                        System.out.println(info.getName());
+                    }
+                     */
+                    //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+//                    Painter<Component> painter = new Painter<Component>() {
+//                        public void paint(Graphics2D g, Component c, int width, int height) {
+//                            g.setColor(c.getBackground());
+//                            //and so forth
+//                        }
+//                    };
+                    //UIManager.put("ProgressBar[Enabled].foregroundPainter", painter);
+                    //UIManager.put("ProgressBar[Enabled].backgroundPainter", painter);
+
+                    for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                        if ("Nimbus".equals(info.getName())) {
+                            UIManager.setLookAndFeel(info.getClassName());
+                            break;
+                        }
+                    }
+
+                    setUIFont(new javax.swing.plaf.FontUIResource(font));
+                    UIManager.put("nimbusOrange", new Color(53, 137, 199));
+                    UIManager.put("background", new Color(201, 212, 216));
 
                     Toolkit toolkit = Toolkit.getDefaultToolkit();
                     Dimension dimension = toolkit.getScreenSize();
@@ -407,8 +518,10 @@ public class MainFrame {
                     //JFrame frame = new JFrame("CourseGUI");
 
                     // MAIN PANEL SELECTOR
-                    mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
-                    //mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
+                    mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
+                    //mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
+                    //mainFrame.frame.getContentPane().add(mainFrame.createSlidesSelectorPanel());
+
 
                     mainFrame.frame.pack();
                     mainFrame.frame.setSize(mainFrame.currentWidth, mainFrame.currentHeight);
@@ -432,57 +545,96 @@ public class MainFrame {
         });
     }
 
-    private JPanel createStartPanel() {
+    private JPanel createContactInformationPanel() {
         MigLayout colLM = new MigLayout(
                 "",
-                "[100px!][fill][grow][100px!]",
-                "[100px!][][][]");
+                "[25%][fill][grow][25%]",
+                "[33%][][][]");
 
-        JPanel panel = new JPanel(colLM) {
-            /*
-            @Override
-            protected void paintComponent(Graphics g) {
-                paintGradient(g, this);
+        URL buttonSlideURL = ClassLoader.getSystemResource("resource/background.jpg");
+
+        try {
+            final BufferedImage bufferedImage = ImageIO.read(buttonSlideURL);
+            JPanel panel = new JPanel(colLM) {
+                private int width = -1;
+                private int height = -1;
+                private Image scaledBufferedImage = null;
+
+                @Override
+                protected void paintComponent(Graphics g) {
+                    if (this.width != getWidth() || this.height != getHeight()) {
+                        this.width = getWidth();
+                        this.height = getHeight();
+                        scaledBufferedImage = bufferedImage.getScaledInstance(this.width, this.height, Image.SCALE_SMOOTH);
+                    }
+                    g.drawImage(scaledBufferedImage, 0, 0, null);
+                }
+            };
+
+            JLabel fullNameLabel = new JLabel("Full Name:");
+            panel.add(fullNameLabel, "cell 1 1");
+            panel.add(new JTextField(), "cell 2 1,growx,wrap");
+
+            JLabel emailLabel = new JLabel("Email:");
+            panel.add(emailLabel, "cell 1 2");
+            panel.add(new JTextField(), "cell 2 2,growx,wrap");
+
+            JLabel organizationLabel = new JLabel("Organization:");
+            panel.add(organizationLabel, "cell 1 3");
+            panel.add(new JTextField(), "cell 2 3,growx,wrap");
+
+            JLabel keyLabel = new JLabel("ID key:");
+            panel.add(keyLabel, "cell 1 4");
+
+            JTextField keytosendText = new JTextField(".JCKBH3J.CN7016681H097Z.BFEBFBFF000006FD");
+            keytosendText.setEditable(false);
+            panel.add(keytosendText, "cell 2 4,growx,wrap");
+
+            JLabel activationKeyLabel = new JLabel("Activation key:");
+            panel.add(activationKeyLabel, "cell 1 5");
+            panel.add(new JTextField(), "cell 2 5,growx,wrap");
+
+
+            URL registerButtonURL = ClassLoader.getSystemResource("resource/button_register.png");
+            final BufferedImage bufferedImage1 = ImageIO.read(registerButtonURL);
+            JLabel registrationButton = new JLabel("Register", SwingConstants.CENTER) {
+                @Override
+                public void paint(Graphics g) {
+                    int width = bufferedImage1.getWidth() / 2;
+                    int height = bufferedImage1.getHeight() / 2;
+                    g.drawImage(bufferedImage1.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
+                    super.paint(g);
+                }
+            };
+            registrationButton.setFont(font);
+            registrationButton.setForeground(new Color(255, 255, 255));
+            registrationButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    System.out.println("Pass registration is clicked");
+                    JPanel lectureSelectorPanel = createLectureSelectorPanel();
+                    frame.setVisible(false);
+                    frame.setContentPane(lectureSelectorPanel);
+                    frame.pack();
+                    frame.setSize(currentWidth, currentHeight);
+                    frame.setVisible(true);
+                }
+            });
+            panel.add(registrationButton, "cell 2 6, gapx push, w 84!, h 25!");
+
+            JComponent[] controls = {fullNameLabel, emailLabel, keyLabel, keytosendText, organizationLabel, activationKeyLabel};
+            for (int i = 0; i < controls.length; i++) {
+                controls[i].setFont(font);
+                controls[i].setForeground(new Color(47, 103, 166));
             }
-            */
-        };
 
-        panel.add(new JLabel("Full Name:"), "cell 1 1");
-        panel.add(new JTextField(), "cell 2 1,growx,wrap");
+            //panel.add(new JSlider(), "cell 2 7, w 600!");
 
-        panel.add(new JLabel("Email:"), "cell 1 2");
-        panel.add(new JTextField(), "cell 2 2,growx,wrap");
+            return panel;
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
 
-        panel.add(new JLabel("Organization:"), "cell 1 3");
-        panel.add(new JTextField(), "cell 2 3,growx,wrap");
-
-        panel.add(new JLabel("Key to send:"), "cell 1 4");
-        JTextField keytosendText = new JTextField("SOMESTRINGBASEDONMOTHERBOARDIDANDPROCESSOR");
-        keytosendText.setEditable(false);
-        panel.add(keytosendText, "cell 2 4,growx,wrap");
-
-        panel.add(new JLabel("Enter key:"), "cell 1 5");
-        panel.add(new JTextField(), "cell 2 5,growx,wrap");
-
-        //panel.add(new JTextField("Login"), "wrap, w 200!");
-        //panel.add(new JTextField("String to send"), "wrap, w 200!");
-        //panel.add(new JTextField("Your string"), "wrap, w 200!");
-        JButton registrationButton = new JButton("Pass registration");
-        registrationButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Pass registration is clicked");
-                JPanel lectureSelectorPanel = createLectureSelectorPanel();
-                frame.setVisible(false);
-                frame.setContentPane(lectureSelectorPanel);
-                frame.pack();
-                frame.setSize(currentWidth, currentHeight);
-                frame.setVisible(true);
-            }
-        });
-
-        panel.add(registrationButton, "cell 2 6,gapx push");
-
-        return panel;
+        return null;
     }
 }

@@ -5,7 +5,6 @@ import javax.imageio.ImageIO
 import scala.xml._
 import java.io.{FileReader, File}
 import scala.xml._
-import java.net.URL
 
 case class Slide(path: String, sound: String)
 
