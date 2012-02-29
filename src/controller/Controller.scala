@@ -4,6 +4,8 @@ import model._
 import model.authorization._
 import model.lectures._
 import java.awt.image.BufferedImage
+import javax.imageio.ImageIO
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
 abstract class Command
 
@@ -31,6 +33,12 @@ case class SelectNextSlideCmd() extends Command {
 case class GetCurrentLectureCmd() extends Command {
   var lectureNumber: Int = -1
   var content: LectureDescription = null
+}
+
+case class UpdateContactsCmd(contacts: Contacts) extends Command
+
+case class GetContactsCmd() extends Command {
+  var contacts: Contacts = null
 }
 
 //case class GetLecturesCountCmd() extends Command {
@@ -106,7 +114,14 @@ class ControllerImplementation(model: Model) extends Controller {
 
       case (cmd: SendQuestionCmd) =>
         val si = ContentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
-        InformationProvider.sendQuestion("CourseGUI question", cmd.text, si.path)
+        val subject = "Course question from %s (%s). %s".format(model.contacts.fullname, model.contacts.email, model.contacts.organization)
+        val os = new ByteArrayOutputStream
+        ImageIO.write(si.content, "png", os)
+        InformationProvider.sendQuestion(subject, cmd.text, si.fullTitle, new ByteArrayInputStream(os.toByteArray))
+
+      case (cmd: UpdateContactsCmd) => model.contacts = cmd.contacts
+
+      case (cmd: GetContactsCmd) => cmd.contacts = model.contacts
 
       //case (cmd: GetLecturesCountCmd) =>
       //  cmd.lecturesCount = ContentManager.getLecturesCount

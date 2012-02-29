@@ -4,6 +4,7 @@ import java.net.URL
 import xml.{Node, XML}
 import controller.{RssItem, RssChannel}
 import java.security.Security
+import java.io.InputStream
 
 object InformationProvider {
   def getNews(): Seq[RssChannel] = {
@@ -64,13 +65,13 @@ object InformationProvider {
     html.toString
   }
 
-  def sendQuestion(subject: String, question: String, filepath: String): Unit = {
-    val sendTo: Array[String] = Array("sanok.m@gmail.com")
+  def sendQuestion(subject: String, question: String, filename: String, fileStream: InputStream): Unit = {
+    val sendTo: Array[String] = Array("alexander.myltsev@gmail.com")
     //val emailMsgTxt: String = question
     //val emailSubjectTxt: String = "A test from edu-cuda"
-    val emailFromAddress: String = "edu.cuda@parallel-compute.com"
+    val emailFromAddress: String = "alexander.myltsev@gmail.com"
     Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider)
-    SmtpMailer.sendSSLMessage(sendTo, subject, question, filepath, emailFromAddress)
+    SmtpMailer.sendSSLMessage(sendTo, subject, question, filename, fileStream, emailFromAddress)
     System.out.println("Sucessfully Sent mail to: " + sendTo.mkString(", "))
   }
 }

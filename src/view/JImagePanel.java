@@ -1,7 +1,6 @@
 package view;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -11,8 +10,8 @@ class JImagePanel extends JPanel {
 
     public JImagePanel(BufferedImage image) {
         this.image = image;
-        Border blackline = BorderFactory.createLineBorder(Color.black);
-        setBorder(blackline);
+        //Border blackline = BorderFactory.createLineBorder(Color.black);
+        //setBorder(blackline);
     }
 
     public void updateImage(BufferedImage image) {

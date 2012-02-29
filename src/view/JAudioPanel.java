@@ -4,10 +4,14 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.media.*;
 import javax.swing.*;
-import java.awt.event.*;
-import java.io.File;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
+
+// TODO: AudioPlayer shouldn't know about Zipped files and URLs
 
 interface JAudioPanelListener {
     void trackIsEnded();
@@ -20,15 +24,16 @@ public class JAudioPanel extends JPanel {
     private JProgressBar audioPlayerLocator;
     private int scale = 3;
 
-    public JAudioPanel() {
+    public JAudioPanel(URL audioURL) {
         try {
             this.setLayout(new MigLayout("", "[][grow,fill][][]", "[]"));
             //this.setBackground(new Color(0, 0, 0, 0));
 
-            String path = "E:/temp/music/music/onclassical_demo_ensemble-la-tempesta_porpora_iii-notturno_iii-lezione_live_small-version.wav";
-            File audioFile = new File(path);
+            //String path = "E:/temp/music/music/onclassical_demo_ensemble-la-tempesta_porpora_iii-notturno_iii-lezione_live_small-version.wav";
+            //File audioFile = new File(path);
 
-            audioPlayer = Manager.createRealizedPlayer(audioFile.toURL());
+            //audioPlayer = Manager.createRealizedPlayer(audioFile.toURL());
+            audioPlayer = Manager.createRealizedPlayer(audioURL);
             audioPlayer.start();
             audioPlayer.getGainControl().setLevel(0.5f);
 
@@ -106,11 +111,12 @@ public class JAudioPanel extends JPanel {
         this.listener = jAudioPanelListener;
     }
 
-    public void play(String path) {
+    public void play(URL audioURL) {
         try {
             audioPlayer.stop();
             audioPlayer.close();
-            audioPlayer = Manager.createRealizedPlayer(new File(path).toURL());
+            //audioPlayer = Manager.createRealizedPlayer(new File(path).toURL());
+            audioPlayer = Manager.createRealizedPlayer(audioURL);
             audioPlayer.getGainControl().setLevel(0.5f);
             audioPlayer.start();
 

@@ -7,6 +7,7 @@ import scala.xml._
 import scala.xml._
 import java.io.{InputStream, FileOutputStream, FileReader, File}
 import java.util.zip.ZipFile
+import java.net.URL
 
 case class Slide(path: String, sound: String)
 
@@ -104,7 +105,28 @@ object ContentManager {
     val imageImputStream: InputStream = zipFile.getInputStream(zipFile.getEntry(previewPath))
     val content = ImageIO.read(imageImputStream)
     val title = "Slide " + slideNumber
-    new SlideInfo(slideNumber, title, previewPath, content)
+    val fullTitle = "Lecture " + (lectureNum + 1) + " - Slide " + (slideNumber + 1)
+
+    // TODO: Completely reconsider code with media
+    val BUFFER_SIZE: Int = 2048
+    val buffer: Array[Byte] = new Array[Byte](BUFFER_SIZE)
+    val soundPath: String = tempDir + "sound"
+    val dest = new FileOutputStream(soundPath)
+    val soundZipEntry: String = lect.path + "/" + sld.sound
+    val zis = zipFile.getInputStream(zipFile.getEntry(soundZipEntry))
+    def readFile(): Unit = {
+      val numRead = zis.read(buffer)
+      if (numRead != -1) {
+        dest.write(buffer, 0, numRead)
+        readFile
+      }
+    }
+    readFile()
+    dest.flush
+    dest.close
+
+    val url: URL = new File(soundPath).toURL
+    new SlideInfo(slideNumber, title, fullTitle, previewPath, content, url)
   }
 
   def getSlidesInfo(lectureNum: Int): Seq[SlideInfo] = {

@@ -27,23 +27,6 @@ public class MainFrame {
     private int currentWidth = 0;
     private String textOfQuestion = "\n\n\nType your question or query here and click \"send\" to receive a consultation";
 
-    /*
-    private String news = "<h2>Latest News</h2>\t\t<h3>February 1, 2012 &nbsp;&nbsp;&nbsp;&nbsp; </h3>\n" +
-            "\t\t<a href=\"http://cuda-course.eventbrite.com/\">5-8 february On-site training and Consultancy and a 4 day advanced CUDA course at  Irish Supercomputing Center ICHEC, Dublin</a>\n" +
-            "\n" +
-            "\t\t<br/><br/>\n" +
-            "\n" +
-            "\t\t<h3>January 16, 2012 &nbsp;&nbsp;&nbsp;&nbsp; </h3>\n" +
-            "\t\t<a href=\"http://parallel-compute.com/education/plan\">January 16-18, 2012. A three day CUDA course at the Technical University of Munich. Germany.</a>\n" +
-            "\t\t\n" +
-            "\t\t<br/><br/>\n" +
-            "\t\n" +
-            "\t\t\n" +
-            "\t\t<h3>December 12, 2011 &nbsp;&nbsp;&nbsp;&nbsp;</h3>\n" +
-            "\t\tGPU Computing and CUDA.&nbsp;Supercomputing winter school at MSU for \"T-Platforms'\n" +
-            "\t\t\n" +
-            "\t";
-            */
     private String news;
 
     private controller.Controller controller;
@@ -53,7 +36,6 @@ public class MainFrame {
         GetNewsCmd command = new GetNewsCmd();
         controller.executeCommand(command);
         news = command.newsHtml();
-        //System.out.println(news);
     }
 
     /*
@@ -350,7 +332,6 @@ public class MainFrame {
         controller.executeCommand(getCurrentSlideCmd);
         final JImagePanel slideSelectorPanel = new JImagePanel(getCurrentSlideCmd.content().content());
 
-        final JAudioPanel jAudioPanel = new JAudioPanel();
 
         URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
         try {
@@ -358,6 +339,10 @@ public class MainFrame {
             //ImageIcon imageIcon = new ImageIcon(buttonSlideURL);
             GetSlidesCmd getSlidesCmd = new GetSlidesCmd();
             controller.executeCommand(getSlidesCmd);
+
+            URL mediaUrl = getSlidesCmd.slidesInfo()[0].mediaURL();
+            final JAudioPanel jAudioPanel = new JAudioPanel(mediaUrl);
+
             for (int i = 0; i < getSlidesCmd.slidesInfo().length; i++) {
                 SlideInfo slideInfo = getSlidesCmd.slidesInfo()[i];
 
@@ -378,13 +363,14 @@ public class MainFrame {
                         SelectSlideCmd selectSlideCmd = new SelectSlideCmd(slideNum);
                         controller.executeCommand(selectSlideCmd);
                         slideSelectorPanel.updateImage(selectSlideCmd.slideInfo().content());
-                        jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
+                        //jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
+                        jAudioPanel.play(selectSlideCmd.slideInfo().mediaURL());
                     }
                 });
-                panel.add(slideButton, "cell 0 0,flowy,sg g1,w 80!");
+                panel.add(slideButton, "cell 0 0,sg g1,w 74!,flowy");
             }
 
-            panel.add(slideSelectorPanel, "grow");
+            panel.add(slideSelectorPanel, "grow,flowy");
             panel.add(createBanner(), "w 200!, h 100!, cell 2 0,flowy");
             panel.add(createNewsPanel(news, true), "w 200!, h 200!, grow, cell 2 0,flowy");
             JLabel askQuestionLabel = new JLabel("Ask a question");
@@ -395,9 +381,10 @@ public class MainFrame {
             jAudioPanel.addListener(new JAudioPanelListener() {
                 @Override
                 public void trackIsEnded() {
-                    jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
+                    //jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
                     SelectNextSlideCmd cmd = new SelectNextSlideCmd();
                     controller.executeCommand(cmd);
+                    jAudioPanel.play(cmd.slideInfo().mediaURL());
                     slideSelectorPanel.updateImage(cmd.slideInfo().content());
                 }
             });
@@ -472,7 +459,7 @@ public class MainFrame {
         }
     }
 
-    JFrame frame = new JFrame("Architecture and CUDA programming  model");
+    JFrame frame = new JFrame("Training course by Applied Parallel Computing");
 
     public static void launch(final Controller controller) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -528,8 +515,8 @@ public class MainFrame {
                     //JFrame frame = new JFrame("CourseGUI");
 
                     // MAIN PANEL SELECTOR
-                    //mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
-                    mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
+                    mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
+                    //mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
                     //mainFrame.frame.getContentPane().add(mainFrame.createSlidesSelectorPanel());
 
 
@@ -583,15 +570,18 @@ public class MainFrame {
 
             JLabel fullNameLabel = new JLabel("Full Name:");
             panel.add(fullNameLabel, "cell 1 1");
-            panel.add(new JTextField(), "cell 2 1,growx,wrap");
+            final JTextField fullNameText = new JTextField();
+            panel.add(fullNameText, "cell 2 1,growx,wrap");
 
             JLabel emailLabel = new JLabel("Email:");
             panel.add(emailLabel, "cell 1 2");
-            panel.add(new JTextField(), "cell 2 2,growx,wrap");
+            final JTextField emailText = new JTextField();
+            panel.add(emailText, "cell 2 2,growx,wrap");
 
             JLabel organizationLabel = new JLabel("Organization:");
             panel.add(organizationLabel, "cell 1 3");
-            panel.add(new JTextField(), "cell 2 3,growx,wrap");
+            final JTextField organizationText = new JTextField();
+            panel.add(organizationText, "cell 2 3,growx,wrap");
 
             JLabel keyLabel = new JLabel("ID key:");
             panel.add(keyLabel, "cell 1 4");
@@ -621,6 +611,10 @@ public class MainFrame {
             registrationButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+                    Contacts contacts = new Contacts(fullNameText.getText(), organizationText.getText(), emailText.getText());
+                    UpdateContactsCmd updateContactsCmd = new UpdateContactsCmd(contacts);
+                    controller.executeCommand(updateContactsCmd);
+
                     System.out.println("Pass registration is clicked");
                     JPanel lectureSelectorPanel = createLectureSelectorPanel();
                     frame.setVisible(false);

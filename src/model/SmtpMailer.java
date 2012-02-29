@@ -2,12 +2,14 @@ package model;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 class SmtpMailer {
@@ -21,7 +23,7 @@ class SmtpMailer {
     private static final String[] sendTo = {""};
 
     public static void sendSSLMessage(String recipients[], String subject,
-                               String text, String pathToFile, String from) throws MessagingException {
+                                      String text, String fileName, InputStream imageStream, String from) throws MessagingException {
         boolean debug = true;
 
         Properties props = new Properties();
@@ -67,10 +69,16 @@ class SmtpMailer {
 
 // Part two is attachment
         messageBodyPart = new MimeBodyPart();
-        DataSource source = new FileDataSource(pathToFile);
-        messageBodyPart.setDataHandler(new DataHandler(source));
-        messageBodyPart.setFileName(pathToFile);
-        multipart.addBodyPart(messageBodyPart);
+
+
+        try {
+            DataSource source = new ByteArrayDataSource(imageStream, "image/png");
+            messageBodyPart.setDataHandler(new DataHandler(source));
+            messageBodyPart.setFileName(fileName);
+            multipart.addBodyPart(messageBodyPart);
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
 
 // Put parts in message
         msg.setContent(multipart);
