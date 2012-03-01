@@ -37,8 +37,10 @@ public class JAudioPanel extends JPanel {
             audioPlayer.start();
             audioPlayer.getGainControl().setLevel(0.5f);
 
-            URL buttonPauseImgURL = ClassLoader.getSystemResource("resource/button_pause.png");
-            URL buttonPlayImgURL = ClassLoader.getSystemResource("resource/button_play.png");
+            //URL buttonPauseImgURL = ClassLoader.getSystemResource("resource/button_pause.png");
+            //URL buttonPlayImgURL = ClassLoader.getSystemResource("resource/button_play.png");
+            URL buttonPauseImgURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_pause.png");
+            URL buttonPlayImgURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_play.png");
             final ImageIcon pauseIcon = new ImageIcon(buttonPauseImgURL);
             final ImageIcon playIcon = new ImageIcon(buttonPlayImgURL);
 
@@ -99,7 +101,8 @@ public class JAudioPanel extends JPanel {
 
             this.add(playPauseButton, "h 35!,w 50!");
             this.add(audioPlayerLocator, "h 35!, growx");
-            URL buttonVolumeImgURL = ClassLoader.getSystemResource("resource/button_volume.png");
+            //URL buttonVolumeImgURL = ClassLoader.getSystemResource("resource/button_volume.png");
+            URL buttonVolumeImgURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_volume.png");
             this.add(new JLabel(new ImageIcon(buttonVolumeImgURL)), "h 35!,w 50!");
             this.add(volumeSlider, "h 35!,w 100!");
         } catch (Exception e) {

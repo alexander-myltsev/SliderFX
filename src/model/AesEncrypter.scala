@@ -67,7 +67,8 @@ object AesEncrypter {
       spec
     }
     */
-    val f = ClassLoader.getSystemResourceAsStream("resource/aes_key")
+    //val f = ClassLoader.getSystemResourceAsStream("resource/aes_key")
+    val f = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/key.aes")
     val bytes = new Array[Byte](16)
     val spec = new SecretKeySpec(bytes, "AES")
     f.read(bytes)
@@ -207,12 +208,10 @@ object AesEncrypter {
   }
 
   def main(args: Array[String]) = {
-    val encryptedFilePath: String = "e:/Projects/ParallelCompute/CourseGUI/CourseContentEnc"
+    val encryptedFilePath: String = "e:/Projects/ParallelCompute/CourseGUI/CourseContent.enc"
     val fileToDecrypt = new File("e:/Projects/ParallelCompute/CourseGUI/CourseContent/")
-    //encryptContent(fileToDecrypt,encryptedFilePath)
+    encryptContent(fileToDecrypt,encryptedFilePath)
     //encryptContentKey()
     //decryptContent(encryptedFilePath)
-
-
   }
 }

@@ -135,7 +135,8 @@ public class MainFrame {
             }
         }
         for (int i = 0; i < pathsToIcons.length; i++) {
-            URL iconURL = ClassLoader.getSystemResource(pathsToIcons[i][0]);
+            //URL iconURL = ClassLoader.getSystemResource(pathsToIcons[i][0]);
+            URL iconURL = Thread.currentThread().getContextClassLoader().getResource(pathsToIcons[i][0]);
             JLabel socialButtonLabel = new JLabel(new ImageIcon(iconURL));
             socialButtonLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             socialButtonLabel.addMouseListener(new SocialButtonsListener(pathsToIcons[i][1]));
@@ -208,7 +209,8 @@ public class MainFrame {
         panel.add(createSendButton(), "gapx push, gapy 0px, cell 1 0, h 35!, w 70!"); // pos visual.x2-pref visual.y2-pref-35
 
         //LectureButtonListener lectureButtonActionListener = new LectureButtonListener(lectureContentViewer);
-        URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
+        //URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
+        URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_slide.png");
 
         try {
             final BufferedImage bufferedImage = ImageIO.read(buttonSlideURL);
@@ -256,7 +258,8 @@ public class MainFrame {
     }
 
     private JComponent createSendButton() {
-        URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
+        //URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
+        URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_slide.png");
         final BufferedImage bufferedImage;
         try {
             bufferedImage = ImageIO.read(buttonSlideURL);
@@ -333,7 +336,8 @@ public class MainFrame {
         final JImagePanel slideSelectorPanel = new JImagePanel(getCurrentSlideCmd.content().content());
 
 
-        URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
+        //URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
+        URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_slide.png");
         try {
             final BufferedImage bufferedImage = ImageIO.read(buttonSlideURL);
             //ImageIcon imageIcon = new ImageIcon(buttonSlideURL);
@@ -430,7 +434,8 @@ public class MainFrame {
     }
 
     private JLabel createBanner() {
-        URL bannerURL = ClassLoader.getSystemResource("resource/TESLA_200x100.jpg");
+        //URL bannerURL = ClassLoader.getSystemResource("resource/TESLA_200x100.jpg");
+        URL bannerURL = Thread.currentThread().getContextClassLoader().getResource("resource/TESLA_200x100.jpg");
         JLabel banner = new JLabel(new ImageIcon(bannerURL));
         banner.setCursor(new Cursor(Cursor.HAND_CURSOR));
         banner.addMouseListener(new MouseAdapter() {
@@ -548,7 +553,8 @@ public class MainFrame {
                 "[25%][fill][grow][25%]",
                 "[33%][][][]");
 
-        URL buttonSlideURL = ClassLoader.getSystemResource("resource/background.jpg");
+        //URL buttonSlideURL = ClassLoader.getSystemResource("resource/background.jpg");
+        URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/background.jpg");
 
         try {
             final BufferedImage bufferedImage = ImageIO.read(buttonSlideURL);
@@ -568,34 +574,43 @@ public class MainFrame {
                 }
             };
 
+            JLabel apcText = new JLabel("APPLIED PARALLEL COMPUTING");
+            Font font1 = new Font(font.getName(), font.getStyle(), font.getSize() + 3);
+            apcText.setFont(font1);
+            apcText.setForeground(new Color(47, 103, 166));
+            panel.add(apcText, "cell 2 1");
+            URL apclogoURL = Thread.currentThread().getContextClassLoader().getResource("resource/logo_APC.png");
+            panel.add(new JLabel(new ImageIcon(apclogoURL)), "cell 1 1");
+
             JLabel fullNameLabel = new JLabel("Full Name:");
-            panel.add(fullNameLabel, "cell 1 1");
+            panel.add(fullNameLabel, "cell 1 2");
             final JTextField fullNameText = new JTextField();
-            panel.add(fullNameText, "cell 2 1,growx,wrap");
+            panel.add(fullNameText, "cell 2 2,growx,wrap");
 
             JLabel emailLabel = new JLabel("Email:");
-            panel.add(emailLabel, "cell 1 2");
+            panel.add(emailLabel, "cell 1 3");
             final JTextField emailText = new JTextField();
-            panel.add(emailText, "cell 2 2,growx,wrap");
+            panel.add(emailText, "cell 2 3,growx,wrap");
 
             JLabel organizationLabel = new JLabel("Organization:");
-            panel.add(organizationLabel, "cell 1 3");
+            panel.add(organizationLabel, "cell 1 4");
             final JTextField organizationText = new JTextField();
-            panel.add(organizationText, "cell 2 3,growx,wrap");
+            panel.add(organizationText, "cell 2 4,growx,wrap");
 
             JLabel keyLabel = new JLabel("ID key:");
-            panel.add(keyLabel, "cell 1 4");
+            panel.add(keyLabel, "cell 1 5");
 
             JTextField keytosendText = new JTextField(".JCKBH3J.CN7016681H097Z.BFEBFBFF000006FD");
             keytosendText.setEditable(false);
-            panel.add(keytosendText, "cell 2 4,growx,wrap");
+            panel.add(keytosendText, "cell 2 5,growx,wrap");
 
             JLabel activationKeyLabel = new JLabel("Activation key:");
-            panel.add(activationKeyLabel, "cell 1 5");
-            panel.add(new JTextField(), "cell 2 5,growx,wrap");
+            panel.add(activationKeyLabel, "cell 1 6");
+            panel.add(new JTextField(), "cell 2 6,growx,wrap");
 
 
-            URL registerButtonURL = ClassLoader.getSystemResource("resource/button_register.png");
+            //URL registerButtonURL = ClassLoader.getSystemResource("resource/button_register.png");
+            URL registerButtonURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_register.png");
             final BufferedImage bufferedImage1 = ImageIO.read(registerButtonURL);
             JLabel registrationButton = new JLabel("Register", SwingConstants.CENTER) {
                 @Override
@@ -624,7 +639,7 @@ public class MainFrame {
                     frame.setVisible(true);
                 }
             });
-            panel.add(registrationButton, "cell 2 6, gapx push, w 84!, h 25!");
+            panel.add(registrationButton, "cell 2 7, gapx push, w 84!, h 25!");
 
             JComponent[] controls = {fullNameLabel, emailLabel, keyLabel, keytosendText, organizationLabel, activationKeyLabel};
             for (int i = 0; i < controls.length; i++) {

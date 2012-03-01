@@ -5,7 +5,7 @@ import controller.{SlideInfo, LectureDescription}
 import javax.imageio.ImageIO
 import scala.xml._
 import scala.xml._
-import java.io.{InputStream, FileOutputStream, FileReader, File}
+import java.io.{InputStream, FileOutputStream, File}
 import java.util.zip.ZipFile
 import java.net.URL
 
@@ -51,13 +51,15 @@ object ContentManager {
   val decryptedFilename: String = tempDir + "tmp"
 
   val lectures = {
-    val encryptedStream = ClassLoader.getSystemResourceAsStream("resource/CourseContent.enc")
+    //val encryptedStream = ClassLoader.getSystemResourceAsStream("resource/CourseContent.enc")
+    val encryptedStream = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
     AesEncrypter.decryptContent(encryptedStream, new FileOutputStream(decryptedFilename))
 
     val zipFile = new ZipFile(decryptedFilename)
     val entry = zipFile.getEntry("manifest.xml")
     val manifestStream: InputStream = zipFile.getInputStream(entry)
     val lectures = parseManifest(manifestStream)
+    //lectures.foreach(l => println(l.slides.size))
     lectures
   }
 
@@ -72,7 +74,8 @@ object ContentManager {
     val previewPath = lect.path + "/" + lect.slides.head.path
     val zipFile = new ZipFile(decryptedFilename)
     val imageImputStream: InputStream = zipFile.getInputStream(zipFile.getEntry(previewPath))
-    val buttonPlayBigImgURL = ClassLoader.getSystemResource("resource/button_play_big.png")
+    //val buttonPlayBigImgURL = ClassLoader.getSystemResource("resource/button_play_big.png")
+    val buttonPlayBigImgURL = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/button_play_big.png")
     val contentWithPlay = overlayImages(ImageIO.read(imageImputStream), ImageIO.read(buttonPlayBigImgURL))
     new LectureDescription(lectureNumber, "Lecture " + (lectureNumber + 1), contentWithPlay)
   }
@@ -110,7 +113,7 @@ object ContentManager {
     // TODO: Completely reconsider code with media
     val BUFFER_SIZE: Int = 2048
     val buffer: Array[Byte] = new Array[Byte](BUFFER_SIZE)
-    val soundPath: String = tempDir + "sound"
+    val soundPath: String = tempDir + "sound.wav"
     val dest = new FileOutputStream(soundPath)
     val soundZipEntry: String = lect.path + "/" + sld.sound
     val zis = zipFile.getInputStream(zipFile.getEntry(soundZipEntry))
