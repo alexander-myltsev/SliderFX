@@ -202,15 +202,16 @@ public class MainFrame {
 
         panel.add(createBanner(), "w 200!, h 100!, flowy, cell 1 0");
         panel.add(createNewsPanel(news, true), "w 200!, h 50%,flowy, cell 1 0");
-        JLabel askQuestionLabel = new JLabel("Ask a question");
+        JLabel askQuestionLabel = new JLabel("Ask a question:");
         askQuestionLabel.setFont(font);
-        panel.add(askQuestionLabel, "gapx push, cell 1 0");
+        askQuestionLabel.setForeground(new Color(47, 103, 166));
+        panel.add(askQuestionLabel, "gapy 30, cell 1 0");
         panel.add(createTextAreaScroll(4, 30, true), "w 200!, h 50%,flowy, grow, cell 1 0");
-        panel.add(createSendButton(), "gapx push, gapy 0px, cell 1 0, h 35!, w 70!"); // pos visual.x2-pref visual.y2-pref-35
+        panel.add(createSendButton(), "gapx push, gapy 0px, cell 1 0, h 35!, w 96!"); // pos visual.x2-pref visual.y2-pref-35
 
         //LectureButtonListener lectureButtonActionListener = new LectureButtonListener(lectureContentViewer);
         //URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
-        URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_slide.png");
+        URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_lecture.png");
 
         try {
             final BufferedImage bufferedImage = ImageIO.read(buttonSlideURL);
@@ -232,7 +233,8 @@ public class MainFrame {
                     }
                 };
                 lectureButton.setFont(font);
-                lectureButton.setForeground(new Color(47, 103, 166));
+                //lectureButton.setForeground(new Color(47, 103, 166));
+                lectureButton.setForeground(new Color(255, 255, 255));
                 final int finalI = i;
                 lectureButton.addMouseListener(new MouseAdapter() {
                     @Override
@@ -259,11 +261,11 @@ public class MainFrame {
 
     private JComponent createSendButton() {
         //URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
-        URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_slide.png");
+        URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_send.png");
         final BufferedImage bufferedImage;
         try {
             bufferedImage = ImageIO.read(buttonSlideURL);
-            JLabel sendButton = new JLabel("Send", SwingConstants.CENTER) {
+            JLabel sendButton = new JLabel("", SwingConstants.CENTER) {
                 public void paint(Graphics g) {
                     int x = (getWidth() - bufferedImage.getWidth()) / 2;
                     int y = (getHeight() - bufferedImage.getHeight()) / 2 + 1;
@@ -271,8 +273,8 @@ public class MainFrame {
                     super.paint(g);
                 }
             };
-            sendButton.setFont(font);
-            sendButton.setForeground(new Color(47, 103, 166));
+            //sendButton.setFont(font);
+            //sendButton.setForeground(new Color(47, 103, 166));
             sendButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -377,11 +379,12 @@ public class MainFrame {
             panel.add(slideSelectorPanel, "grow,flowy");
             panel.add(createBanner(), "w 200!, h 100!, cell 2 0,flowy");
             panel.add(createNewsPanel(news, true), "w 200!, h 50%, grow, cell 2 0,flowy");
-            JLabel askQuestionLabel = new JLabel("Ask a question");
+            JLabel askQuestionLabel = new JLabel("Ask a question:");
+            askQuestionLabel.setForeground(new Color(47, 103, 166));
             askQuestionLabel.setFont(font);
-            panel.add(askQuestionLabel, "gapx push, cell 2 0");
+            panel.add(askQuestionLabel, "gapy 30, cell 2 0");
             panel.add(createTextAreaScroll(4, 30, true), "w 200!, h 50%, grow, cell 2 0,flowy");
-            panel.add(createSendButton(), "cell 2 0, gapx push, gapy 0px, h 35!, w 70!");
+            panel.add(createSendButton(), "cell 2 0, gapx push, gapy 0px, h 35!, w 96!");
             jAudioPanel.addListener(new JAudioPanelListener() {
                 @Override
                 public void trackIsEnded() {

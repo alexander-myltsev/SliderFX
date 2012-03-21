@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0+" codebase="http://tesla.parallel.ru/course/" href="CourseAPC.jnlp">
+	<information>
+		<title>Course APC</title>
+		<vendor>APC</vendor>
+		<homepage href="http://tesla.parallel.ru/course" />
+		<description>Course APC. Description</description>
+	</information>
+	<security>
+		<all-permissions/>
+	</security>
+	<resources>
+		<j2se version="1.6+" />
+		<jar href="cousegui.jar" main="true" download="eager" size="62700052" />
+		<jar href="jmf.jar" />
+		<jar href="mail.jar" />
+		<jar href="miglayout-4.0-swing.jar" />
+		<jar href="scala-compiler.jar" />
+		<jar href="scala-library.jar" />
+	</resources>
+	<application-desc main-class="controller.Launcher" />
+</jnlp>

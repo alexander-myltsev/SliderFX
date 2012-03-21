@@ -1,16 +1,13 @@
-// set the name of the project
 name := "course-gui"
 
 version := "0.1"
 
 organization := "com.parallel-compute"
 
-// set the Scala version used for the project
-//scalaVersion := "2.9.0-1"
 scalaVersion := "2.9.1"
 
 //resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository"
-resolvers += "Local Maven Repository" at "file:///Users/alex/.m2/repository"
+//resolvers += "Local Maven Repository" at "file:///Users/alex/.m2/repository"
 
 // set the main Scala source directory to be <base>/src
 //scalaSource in Compile <<= baseDirectory(_ / "src")
@@ -18,15 +15,12 @@ resolvers += "Local Maven Repository" at "file:///Users/alex/.m2/repository"
 unmanagedSourceDirectories in Compile <++= baseDirectory {
   base =>
     Seq(
-      base / "src" / "controller",
-      base / "src" / "model",
-      base / "src" / "view",
-      base / "demo"
+      base / "src"
     )
 }
 
 // set the Scala test source directory to be <base>/test
-scalaSource in Test <<= baseDirectory(_ / "test")
+//scalaSource in Test <<= baseDirectory(_ / "test")
 
 // add a test dependency on ScalaCheck
 //libraryDependencies += "org.scala-tools.testing" %% "scalacheck" % "1.8" % "test"
@@ -75,10 +69,11 @@ initialCommands := """
 // set the main class for the main 'run' task
 // change Compile to Test to set it for 'test:run'
 //mainClass in (Compile, run) := Some("scalafx.SimpleColorfulCircles")
-mainClass in (Compile, run) := Some("guifx.View")
+//mainClass in (Compile, run) := Some("guifx.View")
 //mainClass in (Compile, run) := Some("scalafx.JumpingFrogsPuzzle")
 //mainClass in (Compile, run) := Some("bindingex2.BindingEx2scala")
 //mainClass in (Compile, run) := Some("WebViewPdfLaunch")
+mainClass in (Compile, run) := Some("controller.Launcher	")
 
 // add <base>/input to the files that '~' triggers on
 watchSources <+= baseDirectory map {
@@ -95,7 +90,7 @@ watchSources <+= baseDirectory map {
 // publishTo := Some("name" at "url")
 
 // set Ivy logging to be at the highest level
-ivyLoggingLevel := UpdateLogging.Full
+//ivyLoggingLevel := UpdateLogging.Full
 
 // disable updating dynamic revisions (including -SNAPSHOT versions)
 offline := true
@@ -198,7 +193,7 @@ password=admin123
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 
 // Directly specify credentials for publishing.
-credentials += Credentials("Sonatype Nexus Repository Manager", "nexus.scala-tools.org", "admin", "admin123")
+//credentials += Credentials("Sonatype Nexus Repository Manager", "nexus.scala-tools.org", "admin", "admin123")
 
 
 

@@ -89,7 +89,12 @@ class ControllerImplementation(model: Model) extends Controller {
       case (cmd: SelectNextSlideCmd) =>
         model.slideNumber += 1
         val si = ContentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
-        cmd.slideInfo = si
+        if (si == null) {
+          model.slideNumber = 0
+          cmd.slideInfo = ContentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
+        } else {
+          cmd.slideInfo = si
+        }
 
       case (cmd: SelectLectureCmd) =>
         val lectureNumber = cmd.lectureNumber
@@ -101,7 +106,8 @@ class ControllerImplementation(model: Model) extends Controller {
         val slideNumber = cmd.slideNumber
         model.slideNumber = slideNumber
         cmd.slideInfo = ContentManager.getSlideInfo(model.lectureNumber, slideNumber)
-      case (cmd: GetSlidesCmd) => cmd.slidesInfo = ContentManager.getSlidesInfo(model.lectureNumber).toArray
+      case (cmd: GetSlidesCmd) =>
+        cmd.slidesInfo = ContentManager.getSlidesInfo(model.lectureNumber).toArray
 
       case (cmd: GetCurrentSlideCmd) =>
         cmd.lectureNumber = model.lectureNumber

@@ -68,7 +68,7 @@ object AesEncrypter {
     }
     */
     //val f = ClassLoader.getSystemResourceAsStream("resource/aes_key")
-    val f = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/key.aes")
+    val f = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/aes_key")
     val bytes = new Array[Byte](16)
     val spec = new SecretKeySpec(bytes, "AES")
     f.read(bytes)
