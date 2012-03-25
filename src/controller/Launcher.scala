@@ -1,17 +1,14 @@
 package controller
 
 import view.MainFrame
-import java.io.File
 import model._
+import java.util.zip.ZipInputStream
 
 object Launcher {
   def main(args: Array[String]): Unit = {
-    val model: Model = new ModelImplementation(new InformationProvider, new ContentManager(new AesEncrypter))
+    val cm: ContentManager = new ContentManager(new AesEncrypter)
+    val model: Model = new ModelImplementation(new InformationProvider, cm)
     val controller: Controller = new ControllerImplementation(model)
     MainFrame.launch(controller)
-
-    val tempDir = System.getProperty("java.io.tmpdir")
-    val unzippedFilename: String = tempDir + "tmp"
-    new File(unzippedFilename).delete
   }
 }
