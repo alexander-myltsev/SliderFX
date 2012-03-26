@@ -5,7 +5,6 @@ import java.util.Arrays
 import java.io._
 import javax.crypto.{Cipher, CipherOutputStream}
 import javax.crypto.spec.{IvParameterSpec, SecretKeySpec}
-import java.util.zip._
 
 // TODO: replace all def readFile
 
@@ -44,7 +43,7 @@ class AesEncrypter {
     secretKeySpec
   }
 
-  private def getKeySpecForContent() = {
+  private val keySpecForContent = {
     val f = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/aes_key")
     val bytes = new Array[Byte](16)
     val spec = new SecretKeySpec(bytes, "AES")
@@ -61,34 +60,41 @@ class AesEncrypter {
   val BUFFER_SIZE: Int = 4096
   val buffer: Array[Byte] = new Array[Byte](BUFFER_SIZE)
 
-  private def zipContent(rootDir: File, aFile: File, zipOut: ZipOutputStream): Unit = {
+  private def encryptContent(rootDir: File, aFile: File, encryptedDirPath: File): Unit = {
     if (aFile.isFile) {
       println("[FILE] " + aFile.getName)
       print("Adding: " + aFile)
-      val fi: FileInputStream = new FileInputStream(aFile.getPath)
+      val fi: FileInputStream = new FileInputStream(aFile)
       val origin: BufferedInputStream = new BufferedInputStream(fi, BUFFER_SIZE)
+
       val relativePath = rootDir.toURI.relativize(aFile.toURI).getPath
       val shaString: String = getSha1String(relativePath)
-      val entry: ZipEntry = new ZipEntry(shaString)
+
       println(" [SHA1: " + shaString + "]")
-      zipOut.putNextEntry(entry)
+
+      val encryptedFilePath = new File(encryptedDirPath, shaString)
+      val encryptedFile = new FileOutputStream(encryptedFilePath)
 
       // http://stackoverflow.com/questions/4905393/scala-inputstream-to-arraybyte
       val originEncrypted = new ByteArrayOutputStream
-      encrypt(origin, originEncrypted, getKeySpecForContent)
-      zipOut.write(originEncrypted.toByteArray, 0, originEncrypted.size)
-      //Stream.continually(originEncrypted.read(buffer)).takeWhile(-1 !=).foreach(zipOut.write(buffer, 0, _))
+      encrypt(origin, originEncrypted, keySpecForContent)
+
+      encryptedFile.write(originEncrypted.toByteArray)
+
+      encryptedFile.flush
+      encryptedFile.close
       origin.close
     } else if (aFile.isDirectory) {
       println("[DIR] " + aFile.getName)
       val listOfFiles: Array[File] = aFile.listFiles
       if (listOfFiles != null) {
-        listOfFiles.foreach(zipContent(rootDir, _, zipOut))
+        listOfFiles.foreach(encryptContent(rootDir, _, encryptedDirPath))
       } else {
         System.out.println(" [ACCESS DENIED]")
       }
     }
   }
+
 
   private def encrypt(in: InputStream, out: OutputStream, key: SecretKeySpec) = {
     val iv = Array[Byte](0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f)
@@ -112,12 +118,9 @@ class AesEncrypter {
 
   def encryptContent(rootDir: File, dirToEncrypt: String, encryptedFileName: String): Unit = {
     val dirToEncryptPath = new File(rootDir, dirToEncrypt)
-    val encryptedFilePath = new File(rootDir, encryptedFileName)
-    val destinationFile = new FileOutputStream(encryptedFilePath)
-    val checksum: CheckedOutputStream = new CheckedOutputStream(destinationFile, new Adler32)
-    val zipOut: ZipOutputStream = new ZipOutputStream(new BufferedOutputStream(checksum))
-    zipContent(dirToEncryptPath, dirToEncryptPath, zipOut)
-    zipOut.close
+    val encryptedDirPath = new File(rootDir, encryptedFileName)
+    encryptedDirPath.mkdir
+    encryptContent(dirToEncryptPath, dirToEncryptPath, encryptedDirPath)
   }
 
   def encryptContentKey() = {
@@ -126,29 +129,12 @@ class AesEncrypter {
     encrypt(new FileInputStream(contentKeyName), new FileOutputStream(contentKeyName + "_enc"), key)
   }
 
-  /*
-  def decryptContent(in: InputStream, out: OutputStream) = {
-    val key = getKeySpecForContent()
-    //decrypt(new FileInputStream(encryptedFilePath), new FileOutputStream(unzippedFilename), key)
-    decrypt(in, out, key)
-  }
-  */
-
-  def decryptContent(in: InputStream, filePath: String) = {
+  def decryptContent(filePath: String) = {
     val shaString = getSha1String(filePath)
-    val encryptedZipStream = new ZipInputStream(in)
-    Stream.
-      continually(encryptedZipStream.getNextEntry).
-      find(_.getName == shaString) match {
-      case Some(x: ZipEntry) =>
-        val zipEntryStream = new ByteArrayOutputStream
-        Stream.continually(encryptedZipStream.read(buffer)).takeWhile(-1 !=).foreach(zipEntryStream.write(buffer, 0, _))
-        val encryptedIn = new ByteArrayInputStream(zipEntryStream.toByteArray, 0, zipEntryStream.size)
-        val decryptedOut = new ByteArrayOutputStream
-        decrypt(encryptedIn, decryptedOut, getKeySpecForContent)
-        new ByteArrayInputStream(decryptedOut.toByteArray, 0, decryptedOut.size)
-      case None => throw new FileNotFoundException("Element of content is not found.")
-    }
+    val encryptedInFileOfContent = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent_enc/" + shaString)
+    val decryptedOut = new ByteArrayOutputStream
+    decrypt(encryptedInFileOfContent, decryptedOut, keySpecForContent)
+    new ByteArrayInputStream(decryptedOut.toByteArray)
   }
 }
 
@@ -176,7 +162,7 @@ object T {
     val aesEnc = new AesEncrypter
     val rootDir = new File("d:/Projects/ParallelCompute/CourseGUI/")
     val dirToEncrypt = "CourseContent"
-    val encryptedFileName = "CourseContent.enc"
+    val encryptedFileName = "CourseContent_enc"
     aesEnc.encryptContent(rootDir, dirToEncrypt, encryptedFileName)
     //    encryptContentKey()
     //    decryptContent(encryptedFilePath)

@@ -56,8 +56,7 @@ class ContentManager(aesEncrypter: AesEncrypter) {
   }
 
   val lectures: List[Lecture] = {
-    val encryptedZipStream = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
-    val manifestStream: InputStream = aesEncrypter.decryptContent(encryptedZipStream, "manifest.xml")
+    val manifestStream: InputStream = aesEncrypter.decryptContent("manifest.xml")
     val lectures = parseManifest(manifestStream)
     //lectures.foreach(l => println(l.slides.size))
     lectures.toList
@@ -67,8 +66,7 @@ class ContentManager(aesEncrypter: AesEncrypter) {
     //println("DEBUG: ContentManager content request for lecture " + lectureNumber)
     val lecture = lectures(lectureNumber)
     val previewPath = lecture.path + "/" + lecture.slides.head.path
-    val encryptedZipStream = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
-    val imageInputStream: InputStream = aesEncrypter.decryptContent(encryptedZipStream, previewPath)
+    val imageInputStream: InputStream = aesEncrypter.decryptContent(previewPath)
     val buttonPlayBigImgURL = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/button_play_big.png")
     val contentWithPlay = overlayImages(ImageIO.read(imageInputStream), ImageIO.read(buttonPlayBigImgURL))
     contentWithPlay
@@ -94,8 +92,7 @@ class ContentManager(aesEncrypter: AesEncrypter) {
   }
 
   private def getSlideContent(previewPath: String) = {
-    val encryptedZipStream1 = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
-    val imageInputStream: InputStream = aesEncrypter.decryptContent(encryptedZipStream1, previewPath)
+    val imageInputStream: InputStream = aesEncrypter.decryptContent(previewPath)
     val content = ImageIO.read(imageInputStream)
     content
   }
@@ -108,8 +105,7 @@ class ContentManager(aesEncrypter: AesEncrypter) {
     val BUFFER_SIZE: Int = 2048
     val buffer: Array[Byte] = new Array[Byte](BUFFER_SIZE)
     val dest = new FileOutputStream(soundPath)
-    val encryptedZipStream2 = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
-    val soundBytes = aesEncrypter.decryptContent(encryptedZipStream2, soundFile)
+    val soundBytes = aesEncrypter.decryptContent(soundFile)
     Stream.continually(soundBytes.read(buffer)).takeWhile(-1 !=).foreach(dest.write(buffer, 0, _))
     dest.flush
     dest.close
