@@ -10,7 +10,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
@@ -135,7 +137,6 @@ public class MainFrame {
             }
         }
         for (int i = 0; i < pathsToIcons.length; i++) {
-            //URL iconURL = ClassLoader.getSystemResource(pathsToIcons[i][0]);
             URL iconURL = Thread.currentThread().getContextClassLoader().getResource(pathsToIcons[i][0]);
             JLabel socialButtonLabel = new JLabel(new ImageIcon(iconURL));
             socialButtonLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -184,14 +185,14 @@ public class MainFrame {
 
         GetCurrentLectureCmd getCurrentLectureCmd = new GetCurrentLectureCmd();
         controller.executeCommand(getCurrentLectureCmd);
-        final JImagePanel lectureContentViewer = new JImagePanel(getCurrentLectureCmd.content().content());
+        final JImagePanel lectureContentViewer = new JImagePanel(getCurrentLectureCmd.content().getContent());
         lectureContentViewer.setCursor(new Cursor(Cursor.HAND_CURSOR));
         lectureContentViewer.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 System.out.println("Mouse clicked");
                 JPanel slidesSelectorPanel = createSlidesSelectorPanel();
-	        frame.setVisible(false);
+                frame.setVisible(false);
                 frame.setContentPane(slidesSelectorPanel);
                 frame.pack();
                 frame.setSize(currentWidth, currentHeight);
@@ -210,7 +211,6 @@ public class MainFrame {
         panel.add(createSendButton(), "gapx push, gapy 0px, cell 1 0, h 35!, w 96!"); // pos visual.x2-pref visual.y2-pref-35
 
         //LectureButtonListener lectureButtonActionListener = new LectureButtonListener(lectureContentViewer);
-        //URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
         URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_lecture.png");
 
         try {
@@ -221,7 +221,7 @@ public class MainFrame {
                 LectureDescription lectureDescription = getLecturesDescriptionsCmd.lecturesDescriptions()[i];
 
                 //JButton lectureButton = new JButton("Lecture " + i);
-                JLabel lectureButton = new JLabel(lectureDescription.information(), SwingConstants.CENTER) {
+                JLabel lectureButton = new JLabel(lectureDescription.getInformation(), SwingConstants.CENTER) {
                     @Override
                     public void paint(Graphics g) {
                         //int imageWidth = bufferedImage.getWidth();
@@ -242,7 +242,7 @@ public class MainFrame {
                         SelectLectureCmd command = new SelectLectureCmd(finalI);
                         controller.executeCommand(command);
                         LectureDescription lectureDescription = command.lectureDescription();
-                        lectureContentViewer.updateImage(lectureDescription.content());
+                        lectureContentViewer.updateImage(lectureDescription.getContent());
                     }
                 });
                 panel.add(lectureButton, "cell 0 1,h 35!,flowx");
@@ -260,7 +260,6 @@ public class MainFrame {
     }
 
     private JComponent createSendButton() {
-        //URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
         URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_send.png");
         final BufferedImage bufferedImage;
         try {
@@ -335,10 +334,9 @@ public class MainFrame {
 
         GetCurrentSlideCmd getCurrentSlideCmd = new GetCurrentSlideCmd();
         controller.executeCommand(getCurrentSlideCmd);
-        final JImagePanel slideSelectorPanel = new JImagePanel(getCurrentSlideCmd.content().content());
+        final JImagePanel slideSelectorPanel = new JImagePanel(getCurrentSlideCmd.content().getContent());
 
 
-        //URL buttonSlideURL = ClassLoader.getSystemResource("resource/button_slide.png");
         URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_slide.png");
         try {
             final BufferedImage bufferedImage = ImageIO.read(buttonSlideURL);
@@ -346,13 +344,13 @@ public class MainFrame {
             GetSlidesCmd getSlidesCmd = new GetSlidesCmd();
             controller.executeCommand(getSlidesCmd);
 
-            URL mediaUrl = getSlidesCmd.slidesInfo()[0].mediaURL();
+            URL mediaUrl = getSlidesCmd.slidesInfo()[0].getMediaURL();
             final JAudioPanel jAudioPanel = new JAudioPanel(mediaUrl);
 
             for (int i = 0; i < getSlidesCmd.slidesInfo().length; i++) {
                 SlideInfo slideInfo = getSlidesCmd.slidesInfo()[i];
 
-                JLabel slideButton = new JLabel(slideInfo.title(), SwingConstants.CENTER) {
+                JLabel slideButton = new JLabel(slideInfo.getTitle(), SwingConstants.CENTER) {
                     public void paint(Graphics g) {
                         int x = (getWidth() - bufferedImage.getWidth()) / 2;
                         int y = (getHeight() - bufferedImage.getHeight()) / 2 + 1;
@@ -368,9 +366,9 @@ public class MainFrame {
                     public void mouseClicked(MouseEvent e) {
                         SelectSlideCmd selectSlideCmd = new SelectSlideCmd(slideNum);
                         controller.executeCommand(selectSlideCmd);
-                        slideSelectorPanel.updateImage(selectSlideCmd.slideInfo().content());
+                        slideSelectorPanel.updateImage(selectSlideCmd.slideInfo().getContent());
                         //jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
-                        jAudioPanel.play(selectSlideCmd.slideInfo().mediaURL());
+                        jAudioPanel.play(selectSlideCmd.slideInfo().getMediaURL());
                     }
                 });
                 panel.add(slideButton, "cell 0 0,sg g1,w 74!,flowy");
@@ -391,8 +389,8 @@ public class MainFrame {
                     //jAudioPanel.play("E:/temp/music/music/onclassical_demo_luisi_chopin_scherzo_2_31_small-version_i-middle.wav");
                     SelectNextSlideCmd cmd = new SelectNextSlideCmd();
                     controller.executeCommand(cmd);
-                    jAudioPanel.play(cmd.slideInfo().mediaURL());
-                    slideSelectorPanel.updateImage(cmd.slideInfo().content());
+                    jAudioPanel.play(cmd.slideInfo().getMediaURL());
+                    slideSelectorPanel.updateImage(cmd.slideInfo().getContent());
                 }
             });
             panel.add(jAudioPanel, "cell 1 1");
@@ -437,7 +435,6 @@ public class MainFrame {
     }
 
     private JLabel createBanner() {
-        //URL bannerURL = ClassLoader.getSystemResource("resource/TESLA_200x100.jpg");
         URL bannerURL = Thread.currentThread().getContextClassLoader().getResource("resource/TESLA_200x100.jpg");
         JLabel banner = new JLabel(new ImageIcon(bannerURL));
         banner.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -556,7 +553,6 @@ public class MainFrame {
                 "[25%][fill][grow][25%]",
                 "[33%][][][]");
 
-        //URL backgroundImageURL = ClassLoader.getSystemResource("resource/background.jpg");
         URL backgroundImageURL = Thread.currentThread().getContextClassLoader().getResource("resource/background.jpg");
 
         try {
@@ -611,8 +607,6 @@ public class MainFrame {
             panel.add(activationKeyLabel, "cell 1 6");
             panel.add(new JTextField(), "cell 2 6,growx,wrap");
 
-
-            //URL registerButtonURL = ClassLoader.getSystemResource("resource/button_register.png");
             URL registerButtonURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_register.png");
             final BufferedImage bufferedImage1 = ImageIO.read(registerButtonURL);
             JLabel registrationButton = new JLabel("Register", SwingConstants.CENTER) {

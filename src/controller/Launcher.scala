@@ -2,7 +2,6 @@ package controller
 
 import view.MainFrame
 import model._
-import java.util.zip.ZipInputStream
 
 object Launcher {
   def main(args: Array[String]): Unit = {

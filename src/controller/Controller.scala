@@ -119,8 +119,8 @@ class ControllerImplementation(model: Model) extends Controller {
         val si = model.contentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
         val subject = "Course question from %s (%s). %s".format(model.contacts.fullname, model.contacts.email, model.contacts.organization)
         val os = new ByteArrayOutputStream
-        ImageIO.write(si.content, "png", os)
-        model.informationProvider.sendQuestion(subject, cmd.text, si.fullTitle, new ByteArrayInputStream(os.toByteArray))
+        ImageIO.write(si.getContent, "png", os)
+        model.informationProvider.sendQuestion(subject, cmd.text, si.getFullTitle, new ByteArrayInputStream(os.toByteArray))
 
       case (cmd: UpdateContactsCmd) => model.contacts = cmd.contacts
 

@@ -6,7 +6,6 @@ import scala.xml._
 import scala.xml._
 import java.io.{InputStream, FileOutputStream, File}
 import java.net.URL
-import java.util.zip.{ZipInputStream, ZipFile}
 
 // TODO: fix temp directory construction
 // win: tempDir + "tmp"
@@ -56,26 +55,27 @@ class ContentManager(aesEncrypter: AesEncrypter) {
     lectures
   }
 
-
-  val lectures = decryptLectures()
-
-  def decryptLectures(): Seq[Lecture] = {
+  val lectures: List[Lecture] = {
     val encryptedZipStream = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
     val manifestStream: InputStream = aesEncrypter.decryptContent(encryptedZipStream, "manifest.xml")
     val lectures = parseManifest(manifestStream)
     //lectures.foreach(l => println(l.slides.size))
-    lectures
+    lectures.toList
   }
 
-
-  def getLectureDescription(lectureNumber: Int): LectureDescription = {
-    val lect = lectures(lectureNumber)
-    val previewPath = lect.path + "/" + lect.slides.head.path
+  private def loadLectureContent(lectureNumber: Int) = {
+    //println("DEBUG: ContentManager content request for lecture " + lectureNumber)
+    val lecture = lectures(lectureNumber)
+    val previewPath = lecture.path + "/" + lecture.slides.head.path
     val encryptedZipStream = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
     val imageInputStream: InputStream = aesEncrypter.decryptContent(encryptedZipStream, previewPath)
     val buttonPlayBigImgURL = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/button_play_big.png")
     val contentWithPlay = overlayImages(ImageIO.read(imageInputStream), ImageIO.read(buttonPlayBigImgURL))
-    new LectureDescription(lectureNumber, "Lecture " + (lectureNumber + 1), contentWithPlay)
+    contentWithPlay
+  }
+
+  def getLectureDescription(lectureNumber: Int): LectureDescription = {
+    new LectureDescription("Lecture " + (lectureNumber + 1), loadLectureContent(lectureNumber))
   }
 
   private def getLecturesCount(): Int = {
@@ -93,43 +93,50 @@ class ContentManager(aesEncrypter: AesEncrypter) {
     lds
   }
 
+  private def getSlideContent(previewPath: String) = {
+    val encryptedZipStream1 = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
+    val imageInputStream: InputStream = aesEncrypter.decryptContent(encryptedZipStream1, previewPath)
+    val content = ImageIO.read(imageInputStream)
+    content
+  }
+
+  private def getSlideSoundUrl(lecturePath: String, slideSoundPath: String) = {
+    val tempDir = System.getProperty("java.io.tmpdir")
+    val soundPath: String = tempDir + "/sound.wav"
+    // TODO: Completely reconsider code with media
+    val soundFile: String = lecturePath + "/" + slideSoundPath
+    val BUFFER_SIZE: Int = 2048
+    val buffer: Array[Byte] = new Array[Byte](BUFFER_SIZE)
+    val dest = new FileOutputStream(soundPath)
+    val encryptedZipStream2 = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
+    val soundBytes = aesEncrypter.decryptContent(encryptedZipStream2, soundFile)
+    Stream.continually(soundBytes.read(buffer)).takeWhile(-1 !=).foreach(dest.write(buffer, 0, _))
+    dest.flush
+    dest.close
+    val url: URL = new File(soundPath).toURL
+    url
+  }
+
   def getSlideInfo(lectureNum: Int, slideNumber: Int): SlideInfo = {
     println("slide requested: " + slideNumber)
 
     if (slideNumber >= getSlidesCount(lectureNum)) null
     else {
       val lecture = lectures(lectureNum)
-      val sld = lecture.slides(slideNumber)
-      val previewPath = lecture.path + "/" + sld.path
-      val encryptedZipStream1 = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
-      val imageInputStream: InputStream = aesEncrypter.decryptContent(encryptedZipStream1, previewPath)
-      val content = ImageIO.read(imageInputStream)
+      val slide = lecture.slides(slideNumber)
+
       val title = "Slide " + (slideNumber + 1)
       val fullTitle = "Lecture " + (lectureNum + 1) + " - Slide " + (slideNumber + 1)
+      val previewPath = lecture.path + "/" + slide.path
 
-      val tempDir = System.getProperty("java.io.tmpdir")
-      val soundPath: String = tempDir + "/sound.wav"
-
-      // TODO: Completely reconsider code with media
-      val soundFile: String = lecture.path + "/" + sld.sound
-      val BUFFER_SIZE: Int = 2048
-      val buffer: Array[Byte] = new Array[Byte](BUFFER_SIZE)
-      val dest = new FileOutputStream(soundPath)
-      val encryptedZipStream2 = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
-      val soundBytes = aesEncrypter.decryptContent(encryptedZipStream2, soundFile)
-      Stream.continually(soundBytes.read(buffer)).takeWhile(-1 !=).foreach(dest.write(buffer, 0, _))
-      dest.flush
-      dest.close
-
-      val url: URL = new File(soundPath).toURL
-      new SlideInfo(slideNumber, title, fullTitle, previewPath, content, url)
+      new SlideInfo(slideNumber, title, fullTitle, previewPath, getSlideContent(previewPath), getSlideSoundUrl(lecture.path, slide.sound))
     }
   }
 
   def getSlidesInfo(lectureNum: Int): Seq[SlideInfo] = {
-    val slds = for (slideNum <- 0 until getSlidesCount(lectureNum)) yield {
+    val slidesInfo = for (slideNum <- 0 until getSlidesCount(lectureNum)) yield {
       getSlideInfo(lectureNum, slideNum)
     }
-    slds
+    slidesInfo
   }
 }
