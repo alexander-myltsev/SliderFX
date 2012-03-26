@@ -125,7 +125,7 @@ class ContentManager(aesEncrypter: AesEncrypter) {
       val fullTitle = "Lecture " + (lectureNum + 1) + " - Slide " + (slideNumber + 1)
       val previewPath = lecture.path + "/" + slide.path
 
-      new SlideInfo(slideNumber, title, fullTitle, previewPath, getSlideContent(previewPath), getSlideSoundUrl(lecture.path, slide.sound))
+      new SlideInfo(slideNumber, title, fullTitle, getSlideContent(previewPath), getSlideSoundUrl(lecture.path, slide.sound))
     }
   }
 

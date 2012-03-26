@@ -9,7 +9,7 @@ class LectureDescription(information: String, content: => BufferedImage) {
   def getInformation = information
 }
 
-class SlideInfo(id: Int, title: String, fullTitle: String, path: String, content: => BufferedImage, mediaURL: => URL) {
+class SlideInfo(id: Int, title: String, fullTitle: String, content: => BufferedImage, mediaURL: => URL) {
   // NOTE: path is for mail sending. Remove it
 
   def getId = id
@@ -17,8 +17,6 @@ class SlideInfo(id: Int, title: String, fullTitle: String, path: String, content
   def getTitle = title
 
   def getFullTitle = fullTitle
-
-  def getPath = path
 
   def getContent = content
 
