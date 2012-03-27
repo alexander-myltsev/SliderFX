@@ -114,7 +114,7 @@ class ContentManager(aesEncrypter: AesEncrypter) {
   }
 
   def getSlideInfo(lectureNum: Int, slideNumber: Int): SlideInfo = {
-    println("slide requested: " + slideNumber)
+    //println("slide requested: " + slideNumber)
 
     if (slideNumber >= getSlidesCount(lectureNum)) null
     else {

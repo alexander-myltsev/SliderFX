@@ -323,14 +323,10 @@ public class MainFrame {
                 "insets 10",
                 "[][grow,fill][]",
                 "[grow,fill][]");
-        JPanel panel = new JPanel(migLayout, true) {
-            /*
-            @Override
-            protected void paintComponent(Graphics g) {
-                paintGradient(g, this);
-            }
-            */
-        };
+        JPanel panel = new JPanel(migLayout, true);
+        JPanel slidesButtonsPanel = new JPanel(new MigLayout("insets 0", "[]", "[]"), true);
+        JScrollPane slidesButtonsScrollPane = new JScrollPane(slidesButtonsPanel);
+        slidesButtonsScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
         GetCurrentSlideCmd getCurrentSlideCmd = new GetCurrentSlideCmd();
         controller.executeCommand(getCurrentSlideCmd);
@@ -371,9 +367,11 @@ public class MainFrame {
                         jAudioPanel.play(selectSlideCmd.slideInfo().getMediaURL());
                     }
                 });
-                panel.add(slideButton, "cell 0 0,sg g1,w 74!,flowy");
+                //panel.add(slideButton, "cell 0 0,sg g1,w 74!,flowy");
+                slidesButtonsPanel.add(slideButton, "cell 0 0,sg g1,w 74!,flowy");
             }
 
+            panel.add(slidesButtonsScrollPane, "cell 0 0, w 95!");
             panel.add(slideSelectorPanel, "grow,flowy");
             panel.add(createBanner(), "w 200!, h 100!, cell 2 0,flowy");
             panel.add(createNewsPanel(news, true), "w 200!, h 50%, grow, cell 2 0,flowy");
@@ -523,7 +521,6 @@ public class MainFrame {
                     //mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
                     mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
                     //mainFrame.frame.getContentPane().add(mainFrame.createSlidesSelectorPanel());
-
 
                     mainFrame.frame.pack();
                     mainFrame.frame.setSize(mainFrame.currentWidth, mainFrame.currentHeight);
