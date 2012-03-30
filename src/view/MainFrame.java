@@ -10,9 +10,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
@@ -518,8 +516,8 @@ public class MainFrame {
                     //JFrame frame = new JFrame("CourseGUI");
 
                     // MAIN PANEL SELECTOR
-                    //mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
-                    mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
+                    mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
+                    //mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
                     //mainFrame.frame.getContentPane().add(mainFrame.createSlidesSelectorPanel());
 
                     mainFrame.frame.pack();
@@ -547,12 +545,28 @@ public class MainFrame {
     private JPanel createContactInformationPanel() {
         MigLayout colLM = new MigLayout(
                 "",
-                "[25%][fill][grow][25%]",
+                "[25%][fill][grow][][25%]",
                 "[33%][][][]");
 
         URL backgroundImageURL = Thread.currentThread().getContextClassLoader().getResource("resource/background.jpg");
 
         try {
+            final JTextField fullNameText = new JTextField();
+            final JTextField emailText = new JTextField();
+            final JTextField organizationText = new JTextField();
+            URL registerButtonURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_register.png");
+            final BufferedImage bufferedImage1 = ImageIO.read(registerButtonURL);
+            final JLabel registrationButton = new JLabel("Register", SwingConstants.CENTER) {
+                @Override
+                public void paint(Graphics g) {
+                    int width = bufferedImage1.getWidth() / 2;
+                    int height = bufferedImage1.getHeight() / 2;
+                    g.drawImage(bufferedImage1.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
+                    super.paint(g);
+                }
+            };
+            registrationButton.setEnabled(false);
+
             final BufferedImage bufferedImage = ImageIO.read(backgroundImageURL);
             JPanel panel = new JPanel(colLM) {
                 private int width = -1;
@@ -578,20 +592,44 @@ public class MainFrame {
             URL apclogoURL = Thread.currentThread().getContextClassLoader().getResource("resource/logo_APC.png");
             panel.add(new JLabel(new ImageIcon(apclogoURL)), "cell 1 1");
 
-            JLabel fullNameLabel = new JLabel("Full Name:");
+            class MyKeyAdapter extends KeyAdapter {
+                private JTextField _textFieldToMonitor;
+                private JLabel _restrictLabel;
+
+                MyKeyAdapter(JTextField textFieldToMonitor, JLabel restrictLabel) {
+                    _textFieldToMonitor = textFieldToMonitor;
+                    _restrictLabel = restrictLabel;
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    super.keyReleased(e);
+                    _restrictLabel.setText(_textFieldToMonitor.getText().equals("") ? "!" : "");
+                    boolean allFilled = !fullNameText.getText().equals("") && !organizationText.getText().equals("") && !emailText.getText().equals("");
+                    registrationButton.setEnabled(allFilled);
+                }
+            }
+
+            JLabel fullNameLabel = new JLabel("Full name:");
+            final JLabel fullNameRestrictLabel = new JLabel("!");
             panel.add(fullNameLabel, "cell 1 2");
-            final JTextField fullNameText = new JTextField();
-            panel.add(fullNameText, "cell 2 2,growx,wrap");
+            fullNameText.addKeyListener(new MyKeyAdapter(fullNameText, fullNameRestrictLabel));
+            panel.add(fullNameText, "cell 2 2,growx");
+            panel.add(fullNameRestrictLabel, "cell 3 2,w 5!,wrap");
 
             JLabel emailLabel = new JLabel("Email:");
             panel.add(emailLabel, "cell 1 3");
-            final JTextField emailText = new JTextField();
-            panel.add(emailText, "cell 2 3,growx,wrap");
+            final JLabel emailRestrictLabel = new JLabel("!");
+            emailText.addKeyListener(new MyKeyAdapter(emailText, emailRestrictLabel));
+            panel.add(emailText, "cell 2 3,growx");
+            panel.add(emailRestrictLabel, "cell 3 3,w 5!,wrap");
 
             JLabel organizationLabel = new JLabel("Organization:");
             panel.add(organizationLabel, "cell 1 4");
-            final JTextField organizationText = new JTextField();
-            panel.add(organizationText, "cell 2 4,growx,wrap");
+            final JLabel organizationRestrictLabel = new JLabel("!");
+            organizationText.addKeyListener(new MyKeyAdapter(organizationText, organizationRestrictLabel));
+            panel.add(organizationText, "cell 2 4,growx");
+            panel.add(organizationRestrictLabel, "cell 3 4,w 5!,wrap");
 
             JLabel keyLabel = new JLabel("ID key:");
             panel.add(keyLabel, "cell 1 5");
@@ -604,22 +642,13 @@ public class MainFrame {
             panel.add(activationKeyLabel, "cell 1 6");
             panel.add(new JTextField(), "cell 2 6,growx,wrap");
 
-            URL registerButtonURL = Thread.currentThread().getContextClassLoader().getResource("resource/button_register.png");
-            final BufferedImage bufferedImage1 = ImageIO.read(registerButtonURL);
-            JLabel registrationButton = new JLabel("Register", SwingConstants.CENTER) {
-                @Override
-                public void paint(Graphics g) {
-                    int width = bufferedImage1.getWidth() / 2;
-                    int height = bufferedImage1.getHeight() / 2;
-                    g.drawImage(bufferedImage1.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
-                    super.paint(g);
-                }
-            };
             registrationButton.setFont(font);
             registrationButton.setForeground(new Color(255, 255, 255));
             registrationButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+                    if (!registrationButton.isEnabled()) return;
+
                     Contacts contacts = new Contacts(fullNameText.getText(), organizationText.getText(), emailText.getText());
                     UpdateContactsCmd updateContactsCmd = new UpdateContactsCmd(contacts);
                     controller.executeCommand(updateContactsCmd);
