@@ -516,8 +516,8 @@ public class MainFrame {
                     //JFrame frame = new JFrame("CourseGUI");
 
                     // MAIN PANEL SELECTOR
-                    mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
-                    //mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
+                    //mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
+                    mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
                     //mainFrame.frame.getContentPane().add(mainFrame.createSlidesSelectorPanel());
 
                     mainFrame.frame.pack();
@@ -583,6 +583,29 @@ public class MainFrame {
                     g.drawImage(scaledBufferedImage, 0, 0, null);
                 }
             };
+
+            /*
+            JButton abc = new JButton("abc", new ImageIcon(registerButtonURL)) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+
+                    float alpha = 0.7f;
+                    AlphaComposite composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+                    ((Graphics2D)g).setComposite(composite);
+
+                    int width = bufferedImage1.getWidth();
+                    int height = bufferedImage1.getHeight();
+                    g.drawImage(bufferedImage1.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
+
+                    ((Graphics2D)g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+                }
+            };
+            abc.setHorizontalTextPosition(SwingConstants.CENTER);
+            abc.setFont(font);
+            abc.setForeground(new Color(255, 255, 255));
+            panel.add(abc, "w 169!, h 51!");
+            */
 
             JLabel apcText = new JLabel("APPLIED PARALLEL COMPUTING");
             Font font1 = new Font(font.getName(), font.getStyle(), font.getSize() + 3);
