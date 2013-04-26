@@ -142,9 +142,51 @@ class GoogleMailer {
     }
 }
 
+/*
+class SoundPlayer {
+    private AudioInputStream audioInputStream;
+    private Clip clip;
+
+    SoundPlayer(String url) {
+        try {
+            audioInputStream = AudioSystem.getAudioInputStream(new FileInputStream(url));
+            clip = AudioSystem.getClip();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    //public static synchronized void playSound(final String url) {
+    public synchronized void playSound() {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Clip clip = AudioSystem.getClip();
+                    //AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(MainFrame.class.getResourceAsStream("/path/to/sounds/" + url));
+                    clip.open(audioInputStream);
+                    clip.start();
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        }).start();
+    }
+
+    public void stopSound() {
+        clip.stop();
+    }
+
+    public void resumeSound() {
+        clip.start();
+    }
+}
+*/
+
 public class MainFrame {
-
-
     private static final boolean OPAQUE = false;
     private int currentHeight = 0;
     private int currentWidth = 0;
@@ -409,7 +451,7 @@ public class MainFrame {
 
         final JImagePanel slideSelectorPanel = new JImagePanel("resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG", false);
 
-        for (int i = 1; i < 23; i++) {
+        for (int i = 1; i < 10; i++) {
             JButton slideButton = new JButton("Slide " + i);
             final int slideNum = i;
             slideButton.addActionListener(new ActionListener() {
@@ -435,10 +477,11 @@ public class MainFrame {
         playPauseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (playPauseButton.getText().equals("||"))
+                if (playPauseButton.getText().equals("||")) {
                     playPauseButton.setText("|>");
-                else
+                } else {
                     playPauseButton.setText("||");
+                }
             }
         });
         panel.add(playPauseButton, "cell 1 1,w 50!,h 35!");
@@ -448,7 +491,7 @@ public class MainFrame {
         JSlider jSlider = new JSlider(0, 100, 100);
         panel.add(jSlider, "cell 1 1,w 100!,h 35!");
 
-        JButton backToLectureSelectionButton = new JButton("<html>Lecture<br/>selection</html>");
+        JButton backToLectureSelectionButton = new JButton("<html><p style=\"text-align: center;\">Lecture<br/>selection</p></html>");
         backToLectureSelectionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -461,7 +504,7 @@ public class MainFrame {
                 frame.setVisible(true);
             }
         });
-        panel.add(backToLectureSelectionButton, "w 70!,h 35!,cell 0 1");
+        panel.add(backToLectureSelectionButton, "w 80!,h 35!,cell 0 1");
 
         ArrayList<JButton> socialButtons = getSocialButtons();
         for (int i = 0; i < socialButtons.size(); i++) {
