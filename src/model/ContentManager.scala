@@ -2,10 +2,12 @@ package model.lectures
 
 import controller.{SlideInfo, LectureDescription}
 import javax.imageio.ImageIO
-import java.io.File
-import javax.swing.JOptionPane
-import java.awt.{AlphaComposite, RenderingHints, Graphics2D}
-import java.awt.image.BufferedImage
+import scala.xml._
+import java.io.{FileReader, File}
+
+case class Slide(path: String, sound: String)
+
+case class Lecture(path: String, slides: Seq[Slide])
 
 object ContentManager {
   private def overlayImages(bgImage: BufferedImage, fgImage: BufferedImage): BufferedImage = {
@@ -50,5 +52,21 @@ object ContentManager {
       getSlideInfo(lectureNum, slideNum)
     }
     slds.toList
+  }
+
+  def parseManifest(path:String) = {
+    val xml = XML.load(new FileReader(path))
+    val course = xml \\ "course"
+    val lectures = (course \\ "lecture").map(lecture => {
+      val path = (lecture \ "@path").text
+      val slides = (lecture \\ "slide").map(slide => {
+        val path = (slide \ "@path").text
+        val sound = (slide \ "@sound").text
+        Slide(path, sound)
+      })
+      Lecture(path, slides)
+    })
+    val lArr = lectures.toArray
+    println(lArr)
   }
 }
