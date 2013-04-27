@@ -1,4 +1,4 @@
-package view;
+package model;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -10,7 +10,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.util.Properties;
 
-class GoogleMailer {
+class SmtpMailer {
 
     private static final String SMTP_HOST_NAME = "smtp.gmail.com";
     private static final String SMTP_PORT = "465";
@@ -20,7 +20,7 @@ class GoogleMailer {
     private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
     private static final String[] sendTo = {""};
 
-    public void sendSSLMessage(String recipients[], String subject,
+    public static void sendSSLMessage(String recipients[], String subject,
                                String text, String from) throws MessagingException {
         boolean debug = true;
 

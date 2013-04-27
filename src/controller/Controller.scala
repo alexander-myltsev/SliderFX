@@ -43,6 +43,10 @@ case class GetSlidesCmd(lectureNumber: Int) extends Command {
   var slidesInfo: List[SlideInfo] = null
 }
 
+case class SendQuestionCmd(text: String) extends Command {
+
+}
+
 trait Controller {
   def executeCommand(command: Command): Unit
 }
@@ -83,6 +87,9 @@ class ControllerImplementation(model: Model) extends Controller {
       case (cmd: GetCurrentLectureCmd) =>
         cmd.lectureNumber = model.lectureNumber
         cmd.content = ContentManager.getLectureDescription(cmd.lectureNumber)
+
+      case (cmd: SendQuestionCmd) =>
+        InformationProvider.sendQuestion(cmd.text)
 
       case _ => throw new Exception("Unexpected state and command")
     }

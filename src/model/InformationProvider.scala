@@ -3,6 +3,7 @@ package model
 import java.net.URL
 import xml.{Node, XML}
 import controller.{RssItem, RssChannel}
+import java.security.Security
 
 object InformationProvider {
   def getNews(): Seq[RssChannel] = {
@@ -52,8 +53,10 @@ object InformationProvider {
           <items>
             {for (item <- channel.items) yield
             <p>
-              {item.title}<a href={item.link}>  {">>"} </a>
-          </p>}
+              {item.title}<a href={item.link}>
+              {">>"}
+            </a>
+            </p>}
           </items>}
       </body>
 
@@ -61,7 +64,13 @@ object InformationProvider {
     html.toString
   }
 
-  def sentQuestion(question: String): Unit = {
-    println("INFO: InformationProvider. Question sent: " + question)
+  def sendQuestion(question: String): Unit = {
+    val sendTo: Array[String] = Array("sanok.m@gmail.com")
+    val emailMsgTxt: String = question
+    val emailSubjectTxt: String = "A test from edu-cuda"
+    val emailFromAddress: String = "edu.cuda@parallel-compute.com"
+    Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider)
+    SmtpMailer.sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress)
+    System.out.println("Sucessfully Sent mail to: " + sendTo.mkString(", "))
   }
 }

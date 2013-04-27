@@ -3,7 +3,6 @@ package view;
 import controller.*;
 import net.miginfocom.swing.MigLayout;
 
-import javax.mail.MessagingException;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -14,7 +13,6 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.Security;
 import java.util.ArrayList;
 
 public class MainFrame {
@@ -67,24 +65,8 @@ public class MainFrame {
         g2d.fillRect(0, 0, d.width, d.height);
     }
 
-    private void postMail(String text) {
-        //private void postMail(String recipients[], String subject, String message, String from) {
-        String[] sendTo = {"sanok.m@gmail.com"};
-        //String emailMsgTxt = "Test Message Contents";
-        String emailMsgTxt = text;
         String emailSubjectTxt = "A test from gmail";
         String emailFromAddress = "alexander.myltsev@gmail.com";
-
-        Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
-
-        try {
-            new GoogleMailer().sendSSLMessage(sendTo, emailSubjectTxt, emailMsgTxt, emailFromAddress);
-            System.out.println("Sucessfully Sent mail to All Users");
-        } catch (MessagingException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-    }
-
     private JScrollPane createTextAreaScroll(int rows, int cols, boolean hasVerScroll) {
         final String text = "\n\n\nType your question or query here and click \"send\" to receive a consultation";
         final JTextArea ta = new JTextArea(textOfQuestion, rows, cols);
@@ -251,7 +233,7 @@ public class MainFrame {
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                postMail(textOfQuestion);
+                controller.executeCommand(new SendQuestionCmd(textOfQuestion));
             }
         });
         return sendButton;
