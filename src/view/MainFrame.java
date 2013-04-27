@@ -402,8 +402,8 @@ public class MainFrame {
                 //JFrame frame = new JFrame("CourseGUI");
 
                 // MAIN PANEL SELECTOR
-                mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
-                //mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
+                //mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
+                mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
 
                 mainFrame.frame.pack();
                 mainFrame.frame.setSize(mainFrame.currentWidth, mainFrame.currentHeight);
