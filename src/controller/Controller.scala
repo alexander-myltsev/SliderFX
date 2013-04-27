@@ -10,7 +10,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 abstract class Command
 
 case class GetNewsCmd() extends Command {
-  var news: List[RssChannel] = null
+  //var news: List[RssChannel] = null
   var newsHtml: String = null
 }
 
@@ -83,7 +83,7 @@ class ControllerImplementation(model: Model) extends Controller {
 
       case (cmd: GetNewsCmd) =>
         val news = InformationProvider.getNews()
-        cmd.news = news.toList
+        //cmd.news = news.toList
         cmd.newsHtml = InformationProvider.channelsToHtml(news)
 
       case (cmd: SelectNextSlideCmd) =>

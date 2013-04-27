@@ -9,6 +9,10 @@ import java.io.{InputStream, FileOutputStream, File}
 import java.util.zip.ZipFile
 import java.net.URL
 
+// TODO: fix temp directory construction
+// win: tempDir + "tmp"
+// nix: tempDir + "/tmp"
+
 case class Slide(path: String, sound: String)
 
 case class Lecture(path: String, slides: Seq[Slide])
@@ -48,9 +52,11 @@ object ContentManager {
   }
 
   val tempDir = System.getProperty("java.io.tmpdir")
-  val decryptedFilename: String = tempDir + "tmp"
+  val decryptedFilename: String = tempDir + "/tmp"
 
-  val lectures = {
+  val lectures = decryptLectures()
+
+  def decryptLectures() = {
     //val encryptedStream = ClassLoader.getSystemResourceAsStream("resource/CourseContent.enc")
     val encryptedStream = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent.enc")
     AesEncrypter.decryptContent(encryptedStream, new FileOutputStream(decryptedFilename))
@@ -113,7 +119,7 @@ object ContentManager {
     // TODO: Completely reconsider code with media
     val BUFFER_SIZE: Int = 2048
     val buffer: Array[Byte] = new Array[Byte](BUFFER_SIZE)
-    val soundPath: String = tempDir + "sound.wav"
+    val soundPath: String = tempDir + "/sound.wav"
     val dest = new FileOutputStream(soundPath)
     val soundZipEntry: String = lect.path + "/" + sld.sound
     val zis = zipFile.getInputStream(zipFile.getEntry(soundZipEntry))

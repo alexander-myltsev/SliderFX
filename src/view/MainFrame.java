@@ -191,7 +191,7 @@ public class MainFrame {
             public void mouseReleased(MouseEvent e) {
                 System.out.println("Mouse clicked");
                 JPanel slidesSelectorPanel = createSlidesSelectorPanel();
-                frame.setVisible(false);
+	        frame.setVisible(false);
                 frame.setContentPane(slidesSelectorPanel);
                 frame.pack();
                 frame.setSize(currentWidth, currentHeight);
@@ -201,11 +201,11 @@ public class MainFrame {
         panel.add(lectureContentViewer, "cell 0 0");
 
         panel.add(createBanner(), "w 200!, h 100!, flowy, cell 1 0");
-        panel.add(createNewsPanel(news, true), "w 200!, h 200!,flowy, cell 1 0");
+        panel.add(createNewsPanel(news, true), "w 200!, h 50%,flowy, cell 1 0");
         JLabel askQuestionLabel = new JLabel("Ask a question");
         askQuestionLabel.setFont(font);
         panel.add(askQuestionLabel, "gapx push, cell 1 0");
-        panel.add(createTextAreaScroll(4, 30, true), "w 200!, flowy, grow, cell 1 0");
+        panel.add(createTextAreaScroll(4, 30, true), "w 200!, h 50%,flowy, grow, cell 1 0");
         panel.add(createSendButton(), "gapx push, gapy 0px, cell 1 0, h 35!, w 70!"); // pos visual.x2-pref visual.y2-pref-35
 
         //LectureButtonListener lectureButtonActionListener = new LectureButtonListener(lectureContentViewer);
@@ -376,11 +376,11 @@ public class MainFrame {
 
             panel.add(slideSelectorPanel, "grow,flowy");
             panel.add(createBanner(), "w 200!, h 100!, cell 2 0,flowy");
-            panel.add(createNewsPanel(news, true), "w 200!, h 200!, grow, cell 2 0,flowy");
+            panel.add(createNewsPanel(news, true), "w 200!, h 50%, grow, cell 2 0,flowy");
             JLabel askQuestionLabel = new JLabel("Ask a question");
             askQuestionLabel.setFont(font);
             panel.add(askQuestionLabel, "gapx push, cell 2 0");
-            panel.add(createTextAreaScroll(4, 30, true), "w 200!, grow, cell 2 0,flowy");
+            panel.add(createTextAreaScroll(4, 30, true), "w 200!, h 50%, grow, cell 2 0,flowy");
             panel.add(createSendButton(), "cell 2 0, gapx push, gapy 0px, h 35!, w 70!");
             jAudioPanel.addListener(new JAudioPanelListener() {
                 @Override
@@ -520,8 +520,8 @@ public class MainFrame {
                     //JFrame frame = new JFrame("CourseGUI");
 
                     // MAIN PANEL SELECTOR
-                    mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
-                    //mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
+                    //mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
+                    mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
                     //mainFrame.frame.getContentPane().add(mainFrame.createSlidesSelectorPanel());
 
 
@@ -553,11 +553,11 @@ public class MainFrame {
                 "[25%][fill][grow][25%]",
                 "[33%][][][]");
 
-        //URL buttonSlideURL = ClassLoader.getSystemResource("resource/background.jpg");
-        URL buttonSlideURL = Thread.currentThread().getContextClassLoader().getResource("resource/background.jpg");
+        //URL backgroundImageURL = ClassLoader.getSystemResource("resource/background.jpg");
+        URL backgroundImageURL = Thread.currentThread().getContextClassLoader().getResource("resource/background.jpg");
 
         try {
-            final BufferedImage bufferedImage = ImageIO.read(buttonSlideURL);
+            final BufferedImage bufferedImage = ImageIO.read(backgroundImageURL);
             JPanel panel = new JPanel(colLM) {
                 private int width = -1;
                 private int height = -1;

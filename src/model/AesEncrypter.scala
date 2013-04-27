@@ -207,7 +207,7 @@ object AesEncrypter {
     */
   }
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]):Unit = {
     val encryptedFilePath: String = "e:/Projects/ParallelCompute/CourseGUI/CourseContent.enc"
     val fileToDecrypt = new File("e:/Projects/ParallelCompute/CourseGUI/CourseContent/")
     encryptContent(fileToDecrypt,encryptedFilePath)
