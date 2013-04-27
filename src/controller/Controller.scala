@@ -7,7 +7,10 @@ import java.awt.image.BufferedImage
 
 abstract class Command
 
-case class GetNewsCmd() extends Command
+case class GetNewsCmd() extends Command {
+  var news: List[RssChannel] = null
+  var newsHtml: String = null
+}
 
 case class AskQuestionCmd() extends Command
 
@@ -53,6 +56,12 @@ class ControllerImplementation(model: Model) extends Controller {
         val key = new Key(cmd.key)
         val status = Authorizer.authorize(key)
         cmd.isPassed = (status == authorization.Status.Success)
+
+      case (cmd: GetNewsCmd) =>
+        val news = InformationProvider.getNews()
+        cmd.news = news.toList
+        cmd.newsHtml = InformationProvider.channelsToHtml(news)
+
 
       case (cmd: SelectLectureCmd) =>
         val lectureNumber = cmd.lectureNumber

@@ -21,6 +21,7 @@ public class MainFrame {
     private int currentWidth = 0;
     private String textOfQuestion = "\n\n\nType your question or query here and click \"send\" to receive a consultation";
 
+    /*
     private String news = "<h2>Latest News</h2>\t\t<h3>February 1, 2012 &nbsp;&nbsp;&nbsp;&nbsp; </h3>\n" +
             "\t\t<a href=\"http://cuda-course.eventbrite.com/\">5-8 february On-site training and Consultancy and a 4 day advanced CUDA course at  Irish Supercomputing Center ICHEC, Dublin</a>\n" +
             "\n" +
@@ -36,11 +37,17 @@ public class MainFrame {
             "\t\tGPU Computing and CUDA.&nbsp;Supercomputing winter school at MSU for \"T-Platforms'\n" +
             "\t\t\n" +
             "\t";
+            */
+    private String news;
 
     private controller.Controller controller;
 
     public MainFrame(Controller controller) {
         this.controller = controller;
+        GetNewsCmd command = new GetNewsCmd();
+        controller.executeCommand(command);
+        news = command.newsHtml();
+        //System.out.println(news);
     }
 
     private void paintGradient(Graphics g, JPanel panel) {
