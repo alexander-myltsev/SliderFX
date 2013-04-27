@@ -3,6 +3,7 @@ package view;
 import controller.*;
 import net.miginfocom.swing.MigLayout;
 
+import javax.mail.MessagingException;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -13,6 +14,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Security;
 import java.util.ArrayList;
 
 public class MainFrame {
@@ -65,10 +67,9 @@ public class MainFrame {
         g2d.fillRect(0, 0, d.width, d.height);
     }
 
-    /*
     private void postMail(String text) {
         //private void postMail(String recipients[], String subject, String message, String from) {
-        String[] sendTo = {"edu.cuda@parallel-compute.com"};
+        String[] sendTo = {"sanok.m@gmail.com"};
         //String emailMsgTxt = "Test Message Contents";
         String emailMsgTxt = text;
         String emailSubjectTxt = "A test from gmail";
@@ -83,7 +84,6 @@ public class MainFrame {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
-    */
 
     private JScrollPane createTextAreaScroll(int rows, int cols, boolean hasVerScroll) {
         final String text = "\n\n\nType your question or query here and click \"send\" to receive a consultation";
@@ -251,8 +251,7 @@ public class MainFrame {
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //postMail(textOfQuestion);
-                System.out.println("!!! NOT IMPLEMENTED !!!");
+                postMail(textOfQuestion);
             }
         });
         return sendButton;
@@ -419,8 +418,8 @@ public class MainFrame {
                 //JFrame frame = new JFrame("CourseGUI");
 
                 // MAIN PANEL SELECTOR
-                //mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
-                mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
+                mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
+                //mainFrame.frame.getContentPane().add(mainFrame.createStartPanel());
 
                 mainFrame.frame.pack();
                 mainFrame.frame.setSize(mainFrame.currentWidth, mainFrame.currentHeight);

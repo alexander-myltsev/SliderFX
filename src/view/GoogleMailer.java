@@ -1,8 +1,13 @@
 package view;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.util.Properties;
 
 class GoogleMailer {
@@ -15,9 +20,8 @@ class GoogleMailer {
     private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
     private static final String[] sendTo = {""};
 
-
     public void sendSSLMessage(String recipients[], String subject,
-                               String message, String from) throws MessagingException {
+                               String text, String from) throws MessagingException {
         boolean debug = true;
 
         Properties props = new Properties();
@@ -49,9 +53,30 @@ class GoogleMailer {
         }
         msg.setRecipients(Message.RecipientType.TO, addressTo);
 
-// Setting the Subject and Content Type
-        msg.setSubject(subject);
-        msg.setContent(message, "text/plain");
+
+        msg.setSubject("Hello JavaMail Attachment");
+
+// Create the message part
+        BodyPart messageBodyPart = new MimeBodyPart();
+
+// Fill the message
+        messageBodyPart.setText("Pardon Ideas");
+
+        Multipart multipart = new MimeMultipart();
+        multipart.addBodyPart(messageBodyPart);
+
+// Part two is attachment
+        messageBodyPart = new MimeBodyPart();
+        String filename = "resource/Lectures/Lecture1/Slide1.PNG";
+        DataSource source = new FileDataSource(filename);
+        messageBodyPart.setDataHandler(new DataHandler(source));
+        messageBodyPart.setFileName(filename);
+        multipart.addBodyPart(messageBodyPart);
+
+// Put parts in message
+        msg.setContent(multipart);
+
+// Send the message
         Transport.send(msg);
     }
 }

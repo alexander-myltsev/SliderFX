@@ -4,6 +4,7 @@ import controller.{SlideInfo, LectureDescription}
 import javax.imageio.ImageIO
 import scala.xml._
 import java.io.{FileReader, File}
+import scala.xml._
 
 case class Slide(path: String, sound: String)
 
