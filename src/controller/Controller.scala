@@ -33,6 +33,14 @@ case class GetCurrentLectureCmd() extends Command {
   var content: LectureDescription = null
 }
 
+//case class GetLecturesCountCmd() extends Command {
+//  var lecturesCount: Int = -1
+//}
+
+//case class GetSlidesCountCmd() extends Command {
+//  var slidesCount: Int = -1
+//}
+
 case class GetCurrentSlideCmd() extends Command {
   var lectureNumber: Int = -1
   var slideNumber: Int = -1
@@ -40,11 +48,11 @@ case class GetCurrentSlideCmd() extends Command {
 }
 
 case class GetLecturesDescriptionsCmd() extends Command {
-  var lecturesDescriptions: List[LectureDescription] = null
+  var lecturesDescriptions: Array[LectureDescription] = null
 }
 
-case class GetSlidesCmd(lectureNumber: Int) extends Command {
-  var slidesInfo: List[SlideInfo] = null
+case class GetSlidesCmd() extends Command {
+  var slidesInfo: Array[SlideInfo] = null
 }
 
 case class SendQuestionCmd(text: String) extends Command {
@@ -79,13 +87,13 @@ class ControllerImplementation(model: Model) extends Controller {
         val lectureNumber = cmd.lectureNumber
         model.lectureNumber = lectureNumber
         cmd.lectureDescription = ContentManager.getLectureDescription(lectureNumber)
-      case (cmd: GetLecturesDescriptionsCmd) => cmd.lecturesDescriptions = ContentManager.getLecturesDescriptions
+      case (cmd: GetLecturesDescriptionsCmd) => cmd.lecturesDescriptions = ContentManager.getLecturesDescriptions.toArray
 
       case (cmd: SelectSlideCmd) =>
         val slideNumber = cmd.slideNumber
         model.slideNumber = slideNumber
         cmd.slideInfo = ContentManager.getSlideInfo(model.lectureNumber, slideNumber)
-      case (cmd: GetSlidesCmd) => cmd.slidesInfo = ContentManager.getSlidesInfo(cmd.lectureNumber)
+      case (cmd: GetSlidesCmd) => cmd.slidesInfo = ContentManager.getSlidesInfo(model.lectureNumber).toArray
 
       case (cmd: GetCurrentSlideCmd) =>
         cmd.lectureNumber = model.lectureNumber
@@ -99,6 +107,12 @@ class ControllerImplementation(model: Model) extends Controller {
       case (cmd: SendQuestionCmd) =>
         val si = ContentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
         InformationProvider.sendQuestion("CourseGUI question", cmd.text, si.path)
+
+      //case (cmd: GetLecturesCountCmd) =>
+      //  cmd.lecturesCount = ContentManager.getLecturesCount
+
+      //case (cmd: GetSlidesCountCmd) =>
+      //  cmd.slidesCount = ContentManager.getSlidesCount(model.lectureNumber)
 
       case _ => throw new Exception("Unexpected state and command")
     }

@@ -1,10 +1,12 @@
 package model.lectures
 
+import model._
 import controller.{SlideInfo, LectureDescription}
 import javax.imageio.ImageIO
 import scala.xml._
-import java.io.{FileReader, File}
 import scala.xml._
+import java.io.{InputStream, FileOutputStream, FileReader, File}
+import java.util.zip.ZipFile
 
 case class Slide(path: String, sound: String)
 
@@ -27,37 +29,8 @@ object ContentManager {
     bgImage
   }
 
-  def getLectureDescription(lectureNumber: Int): LectureDescription = {
-    val previewPath = "resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG"
-    val content = ImageIO.read(new File(previewPath))
-    val buttonPlayBigImgURL = ClassLoader.getSystemResource("resource/button_play_big.png")
-    val contentWithPlay = overlayImages(content, ImageIO.read(buttonPlayBigImgURL))
-    new LectureDescription(lectureNumber, "Lecture " + lectureNumber, contentWithPlay)
-  }
-
-  def getLecturesDescriptions: List[LectureDescription] = {
-    val lds = for (lectureNum <- 1 to 4) yield {
-      getLectureDescription(lectureNum)
-    }
-    lds.toList
-  }
-
-  def getSlideInfo(lectureNum: Int, slideNumber: Int): SlideInfo = {
-    val previewPath = "resource/Lectures/Lecture" + lectureNum + "/Slide" + slideNumber + ".PNG"
-    val title = "Slide " + slideNumber
-    val content = ImageIO.read(new File(previewPath))
-    new SlideInfo(slideNumber, title, previewPath, content)
-  }
-
-  def getSlidesInfo(lectureNum: Int): List[SlideInfo] = {
-    val slds = for (slideNum <- 1 to 15) yield {
-      getSlideInfo(lectureNum, slideNum)
-    }
-    slds.toList
-  }
-
-  def parseManifest(path:String) = {
-    val xml = XML.load(new FileReader(path))
+  def parseManifest(inXml: InputStream) = {
+    val xml = XML.load(Source.fromInputStream(inXml))
     val course = xml \\ "course"
     val lectures = (course \\ "lecture").map(lecture => {
       val path = (lecture \ "@path").text
@@ -68,7 +41,76 @@ object ContentManager {
       })
       Lecture(path, slides)
     })
-    val lArr = lectures.toArray
-    println(lArr)
+    //val lArr = lectures.toArray
+    //println(lArr)
+    lectures
+  }
+
+  val tempDir = System.getProperty("java.io.tmpdir")
+  val decryptedFilename: String = tempDir + "tmp"
+
+  val lectures = {
+    val encryptedStream = ClassLoader.getSystemResourceAsStream("resource/CourseContent.enc")
+    AesEncrypter.decryptContent(encryptedStream, new FileOutputStream(decryptedFilename))
+
+    val zipFile = new ZipFile(decryptedFilename)
+    val entry = zipFile.getEntry("manifest.xml")
+    val manifestStream: InputStream = zipFile.getInputStream(entry)
+    val lectures = parseManifest(manifestStream)
+    lectures
+  }
+
+  def getLectureDescription(lectureNumber: Int): LectureDescription = {
+    //val previewPath = "resource/Lectures/Lecture" + lectureNumber + "/Slide1.PNG"
+    //val content = ImageIO.read(new File(previewPath))
+    //val buttonPlayBigImgURL = ClassLoader.getSystemResource("resource/button_play_big.png")
+    //val contentWithPlay = overlayImages(content, ImageIO.read(buttonPlayBigImgURL))
+    //new LectureDescription(lectureNumber, "Lecture " + lectureNumber, contentWithPlay)
+
+    val lect = lectures(lectureNumber)
+    val previewPath = lect.path + "/" + lect.slides.head.path
+    val zipFile = new ZipFile(decryptedFilename)
+    val imageImputStream: InputStream = zipFile.getInputStream(zipFile.getEntry(previewPath))
+    val buttonPlayBigImgURL = ClassLoader.getSystemResource("resource/button_play_big.png")
+    val contentWithPlay = overlayImages(ImageIO.read(imageImputStream), ImageIO.read(buttonPlayBigImgURL))
+    new LectureDescription(lectureNumber, "Lecture " + (lectureNumber + 1), contentWithPlay)
+  }
+
+  private def getLecturesCount(): Int = {
+    lectures.length
+  }
+
+  private def getSlidesCount(lectureNumber: Int): Int = {
+    lectures(lectureNumber).slides.length
+  }
+
+  def getLecturesDescriptions: Seq[LectureDescription] = {
+    val lds = for (lectureNum <- 0 until getLecturesCount) yield {
+      getLectureDescription(lectureNum)
+    }
+    lds
+  }
+
+  def getSlideInfo(lectureNum: Int, slideNumber: Int): SlideInfo = {
+    //val previewPath = "resource/Lectures/Lecture" + lectureNum + "/Slide" + slideNumber + ".PNG"
+    //val title = "Slide " + slideNumber
+    //val content = ImageIO.read(new File(previewPath))
+    //new SlideInfo(slideNumber, title, previewPath, content)
+
+    val lect = lectures(lectureNum)
+    val sld = lect.slides(slideNumber)
+    val previewPath = lect.path + "/" + sld.path
+    val zipFile = new ZipFile(decryptedFilename)
+    val imageImputStream: InputStream = zipFile.getInputStream(zipFile.getEntry(previewPath))
+    val content = ImageIO.read(imageImputStream)
+    val title = "Slide " + slideNumber
+    new SlideInfo(slideNumber, title, previewPath, content)
+  }
+
+  def getSlidesInfo(lectureNum: Int): Seq[SlideInfo] = {
+    val slds = for (slideNum <- 1 until getSlidesCount(lectureNum)) yield {
+      getSlideInfo(lectureNum, slideNum)
+    }
+    slds
   }
 }

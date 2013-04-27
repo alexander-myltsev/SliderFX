@@ -18,7 +18,7 @@ class ModelImplementation() extends Model {
   def slideNumber_=(v: Int) = _slideNumbersPerLecture(_lectureNumber) = v
 
 
-  private var _lectureNumber = 1
+  private var _lectureNumber = 0
 
   def lectureNumber = _lectureNumber
 

@@ -162,6 +162,7 @@ public class MainFrame {
         return buttons;
     }
 
+    /*
     class LectureButtonListener implements ActionListener {
         private JImagePanel lectureContentViewer;
 
@@ -182,6 +183,7 @@ public class MainFrame {
             lectureContentViewer.updateImage(lectureDescription.content());
         }
     }
+    */
 
     private JPanel createLectureSelectorPanel() {
         final JPanel panel = new JPanel(new MigLayout(
@@ -228,15 +230,19 @@ public class MainFrame {
 
         try {
             final BufferedImage bufferedImage = ImageIO.read(buttonSlideURL);
-            for (int i = 1; i <= 4; i++) {
+            GetLecturesDescriptionsCmd getLecturesDescriptionsCmd = new GetLecturesDescriptionsCmd();
+            controller.executeCommand(getLecturesDescriptionsCmd);
+            for (int i = 0; i < getLecturesDescriptionsCmd.lecturesDescriptions().length; i++) {
+                LectureDescription lectureDescription = getLecturesDescriptionsCmd.lecturesDescriptions()[i];
+
                 //JButton lectureButton = new JButton("Lecture " + i);
-                JLabel lectureButton = new JLabel("Lecture " + i, SwingConstants.CENTER) {
+                JLabel lectureButton = new JLabel(lectureDescription.information(), SwingConstants.CENTER) {
                     @Override
                     public void paint(Graphics g) {
-                        int imageWidth = bufferedImage.getWidth();
-                        int imageHeight = bufferedImage.getHeight();
-                        int x = (getWidth() - imageWidth) / 2;
-                        int y = (getHeight() - imageHeight) / 2 + 1;
+                        //int imageWidth = bufferedImage.getWidth();
+                        //int imageHeight = bufferedImage.getHeight();
+                        //int x = (getWidth() - imageWidth) / 2;
+                        //int y = (getHeight() - imageHeight) / 2 + 1;
                         g.drawImage(bufferedImage.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
                         super.paint(g);
                     }
@@ -350,8 +356,12 @@ public class MainFrame {
         try {
             final BufferedImage bufferedImage = ImageIO.read(buttonSlideURL);
             //ImageIcon imageIcon = new ImageIcon(buttonSlideURL);
-            for (int i = 1; i < 19; i++) {
-                JLabel slideButton = new JLabel("Slide " + i, SwingConstants.CENTER) {
+            GetSlidesCmd getSlidesCmd = new GetSlidesCmd();
+            controller.executeCommand(getSlidesCmd);
+            for (int i = 0; i < getSlidesCmd.slidesInfo().length; i++) {
+                SlideInfo slideInfo = getSlidesCmd.slidesInfo()[i];
+
+                JLabel slideButton = new JLabel(slideInfo.title(), SwingConstants.CENTER) {
                     public void paint(Graphics g) {
                         int x = (getWidth() - bufferedImage.getWidth()) / 2;
                         int y = (getHeight() - bufferedImage.getHeight()) / 2 + 1;
@@ -518,8 +528,8 @@ public class MainFrame {
                     //JFrame frame = new JFrame("CourseGUI");
 
                     // MAIN PANEL SELECTOR
-                    mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
-                    //mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
+                    //mainFrame.frame.getContentPane().add(mainFrame.createContactInformationPanel());
+                    mainFrame.frame.getContentPane().add(mainFrame.createLectureSelectorPanel());
                     //mainFrame.frame.getContentPane().add(mainFrame.createSlidesSelectorPanel());
 
 
