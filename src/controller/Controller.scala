@@ -1,9 +1,6 @@
 package controller
 
 import model._
-import model.authorization._
-import model.lectures._
-import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
@@ -79,19 +76,19 @@ class ControllerImplementation(model: Model) extends Controller {
       case (cmd: AuthorizeCmd) =>
         val key = new Key(cmd.key)
         val status = Authorizer.authorize(key)
-        cmd.isPassed = (status == authorization.Status.Success)
+        cmd.isPassed = (status == Status.Success)
 
       case (cmd: GetNewsCmd) =>
-        val news = InformationProvider.getNews()
+        val news = model.informationProvider.getNews
         //cmd.news = news.toList
-        cmd.newsHtml = InformationProvider.channelsToHtml(news)
+        cmd.newsHtml = model.informationProvider.channelsToHtml(news)
 
       case (cmd: SelectNextSlideCmd) =>
         model.slideNumber += 1
-        val si = ContentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
+        val si = model.contentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
         if (si == null) {
           model.slideNumber = 0
-          cmd.slideInfo = ContentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
+          cmd.slideInfo = model.contentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
         } else {
           cmd.slideInfo = si
         }
@@ -99,31 +96,31 @@ class ControllerImplementation(model: Model) extends Controller {
       case (cmd: SelectLectureCmd) =>
         val lectureNumber = cmd.lectureNumber
         model.lectureNumber = lectureNumber
-        cmd.lectureDescription = ContentManager.getLectureDescription(lectureNumber)
-      case (cmd: GetLecturesDescriptionsCmd) => cmd.lecturesDescriptions = ContentManager.getLecturesDescriptions.toArray
+        cmd.lectureDescription = model.contentManager.getLectureDescription(lectureNumber)
+      case (cmd: GetLecturesDescriptionsCmd) => cmd.lecturesDescriptions = model.contentManager.getLecturesDescriptions.toArray
 
       case (cmd: SelectSlideCmd) =>
         val slideNumber = cmd.slideNumber
         model.slideNumber = slideNumber
-        cmd.slideInfo = ContentManager.getSlideInfo(model.lectureNumber, slideNumber)
+        cmd.slideInfo = model.contentManager.getSlideInfo(model.lectureNumber, slideNumber)
       case (cmd: GetSlidesCmd) =>
-        cmd.slidesInfo = ContentManager.getSlidesInfo(model.lectureNumber).toArray
+        cmd.slidesInfo = model.contentManager.getSlidesInfo(model.lectureNumber).toArray
 
       case (cmd: GetCurrentSlideCmd) =>
         cmd.lectureNumber = model.lectureNumber
         cmd.slideNumber = model.slideNumber
-        cmd.content = ContentManager.getSlideInfo(cmd.lectureNumber, cmd.slideNumber)
+        cmd.content = model.contentManager.getSlideInfo(cmd.lectureNumber, cmd.slideNumber)
 
       case (cmd: GetCurrentLectureCmd) =>
         cmd.lectureNumber = model.lectureNumber
-        cmd.content = ContentManager.getLectureDescription(cmd.lectureNumber)
+        cmd.content = model.contentManager.getLectureDescription(cmd.lectureNumber)
 
       case (cmd: SendQuestionCmd) =>
-        val si = ContentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
+        val si = model.contentManager.getSlideInfo(model.lectureNumber, model.slideNumber)
         val subject = "Course question from %s (%s). %s".format(model.contacts.fullname, model.contacts.email, model.contacts.organization)
         val os = new ByteArrayOutputStream
         ImageIO.write(si.content, "png", os)
-        InformationProvider.sendQuestion(subject, cmd.text, si.fullTitle, new ByteArrayInputStream(os.toByteArray))
+        model.informationProvider.sendQuestion(subject, cmd.text, si.fullTitle, new ByteArrayInputStream(os.toByteArray))
 
       case (cmd: UpdateContactsCmd) => model.contacts = cmd.contacts
 

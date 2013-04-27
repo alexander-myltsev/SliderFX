@@ -1,12 +1,12 @@
 package controller
 
 import view.MainFrame
-import model.{Model, ModelImplementation}
 import java.io.File
+import model._
 
 object Launcher {
   def main(args: Array[String]): Unit = {
-    val model: Model = new ModelImplementation()
+    val model: Model = new ModelImplementation(new InformationProvider, new ContentManager(new AesEncrypter))
     val controller: Controller = new ControllerImplementation(model)
     MainFrame.launch(controller)
 

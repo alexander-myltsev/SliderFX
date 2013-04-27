@@ -14,9 +14,13 @@ trait Model {
   def contacts: Contacts
 
   def contacts_=(v: Contacts)
+
+  def informationProvider: InformationProvider
+
+  def contentManager: ContentManager
 }
 
-class ModelImplementation() extends Model {
+class ModelImplementation(ip: InformationProvider, cm: ContentManager) extends Model {
   private val _slideNumbersPerLecture = Array(0, 0, 0, 0)
 
   def slideNumber = _slideNumbersPerLecture(_lectureNumber)
@@ -36,4 +40,8 @@ class ModelImplementation() extends Model {
   def contacts_=(v: Contacts) = _contacts = v
 
   def contacts = _contacts
+
+  def informationProvider: InformationProvider = ip
+
+  def contentManager: ContentManager = cm
 }

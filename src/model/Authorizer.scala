@@ -1,4 +1,4 @@
-package model.authorization
+package model
 
 object Status extends Enumeration {
   type Status = Value

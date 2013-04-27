@@ -3,11 +3,8 @@ package model
 import java.security.MessageDigest
 import java.util.Arrays
 import java.io._
-import javax.crypto.{Cipher, CipherOutputStream, KeyGenerator}
-import java.security.spec.AlgorithmParameterSpec
+import javax.crypto.{Cipher, CipherOutputStream}
 import javax.crypto.spec.{IvParameterSpec, SecretKeySpec}
-import collection.mutable.ArrayBuffer
-import com.sun.mail.iap.ByteArray
 import java.util.zip._
 
 // TODO: replace all def readFile
@@ -16,7 +13,7 @@ case class Ids(motherboardID: String, processorID: String) {
   override def toString = "Ids[" + motherboardID + "][" + processorID + "]"
 }
 
-object AesEncrypter {
+class AesEncrypter {
   val contentKeyName: String = "aes_key"
 
   def getIdsWindows() = {

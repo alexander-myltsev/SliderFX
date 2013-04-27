@@ -6,7 +6,7 @@ import controller.{RssItem, RssChannel}
 import java.security.Security
 import java.io.InputStream
 
-object InformationProvider {
+class InformationProvider {
   def getNews(): Option[Seq[RssChannel]] = {
     try {
       extractRss("""http://news.developer.nvidia.com/rss.xml""")

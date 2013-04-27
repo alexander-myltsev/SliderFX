@@ -1,4 +1,4 @@
-package model.lectures
+package model
 
 import model._
 import controller.{SlideInfo, LectureDescription}
@@ -23,7 +23,7 @@ case class Slide(path: String, sound: String)
 
 case class Lecture(path: String, slides: Seq[Slide])
 
-object ContentManager {
+class ContentManager(aesEncrypter: AesEncrypter) {
   private def overlayImages(bgImage: BufferedImage, fgImage: BufferedImage): BufferedImage = {
     if (fgImage.getHeight > bgImage.getHeight || fgImage.getWidth > fgImage.getWidth) {
       JOptionPane.showMessageDialog(null, "Foreground Image Is Bigger In One or Both Dimensions" + "\nCannot proceed with overlay." + "\n\n Please use smaller Image for foreground")
@@ -65,7 +65,7 @@ object ContentManager {
   def decryptLectures() = {
     //val encryptedStream = ClassLoader.getSystemResourceAsStream("resource/CourseContent.enc")
     val encryptedStream = Thread.currentThread.getContextClassLoader.getResourceAsStream("resource/CourseContent")
-    AesEncrypter.decryptContent(encryptedStream, new FileOutputStream(decryptedFilename))
+    aesEncrypter.decryptContent(encryptedStream, new FileOutputStream(decryptedFilename))
 
     val zipFile = new ZipFile(decryptedFilename)
     val entry = zipFile.getEntry("manifest.xml")
